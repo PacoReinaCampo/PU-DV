@@ -4,3 +4,6 @@
 [submodule "pu-msp430"]
 	path = pu-msp430
 	url = https://github.com/PacoReinaCampo/PU-MSP430.git
+[submodule "pu-riscv"]
+	path = pu-riscv
+	url = https://github.com/PacoReinaCampo/PU-RISCV.git
