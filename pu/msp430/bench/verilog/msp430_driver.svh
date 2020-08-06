@@ -51,6 +51,7 @@ class msp430_driver extends uvm_driver #(msp430_transaction);
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
+
   bit drv_clk;
 
   function void build_phase(uvm_phase phase);
@@ -63,7 +64,8 @@ class msp430_driver extends uvm_driver #(msp430_transaction);
   endfunction 
 
   task run_phase(uvm_phase phase);
-    reg[15:0]mem[0:18];
+    reg [15:0] mem [0:18];
+
     int count = 0;
 
     //Set initial instructions.txt file

@@ -45,29 +45,21 @@
 import uvm_pkg::*;
 
 //Include common files
-`include "msp430_sequence.sv"
+`include "msp430_agent.sv"
 `include "msp430_driver.sv"
+`include "msp430_env.sv"
 `include "msp430_monitor.sv"
 `include "msp430_scoreboard.sv"
+`include "msp430_sequence.sv"
 `include "msp430_subscriber.sv"
-`include "msp430_agent.sv"
-`include "msp430_env.sv"
 `include "msp430_test.sv"
 
-module top;  
-  bit clk;
-  
-  //clock generation
-  always #5 clk = ~clk;
-  
-  initial begin
-    clk = 0;
-  end
+module test;
 
-  // Instantiate the interface
-  msp430_interface msp430_if(clk);
+  // Instantiate interface
+  msp430_interface msp430_if();
+
   // Instantiate dut
-
   msp430_pu dut (
     .dbg_clk           (msp430_if.dbg_clk),
     .dbg_rst           (msp430_if.dbg_rst),
@@ -147,6 +139,13 @@ module top;
     .r14               (msp430_if.r14),
     .r15               (msp430_if.r15)
   );
+
+  //Clock generation
+  always #5 msp430_if.dbg_clk = ~msp430_if.dbg_clk;
+  
+  initial begin
+    msp430_if.dbg_clk = 0;
+  end
 
   initial begin
     // Place the interface into the UVM configuration database

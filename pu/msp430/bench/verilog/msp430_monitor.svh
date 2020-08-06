@@ -83,12 +83,14 @@ class msp430_monitor extends uvm_monitor;
             pros_trans.reg_en = msp430_vif.monitor_if_mp.monitor_cb.reg_en;
             pros_trans.reg_add = msp430_vif.monitor_if_mp.monitor_cb.reg_add;
             pros_trans.mem_data = msp430_vif.monitor_if_mp.monitor_cb.mem_data;
-            pros_trans.mem_en = msp430_vif.monitor_if_mp.monitor_cb.mem_en;						
-            pros_trans.mem_add = msp430_vif.monitor_if_mp.monitor_cb.mem_add;			
+            pros_trans.mem_en = msp430_vif.monitor_if_mp.monitor_cb.mem_en;
+            pros_trans.mem_add = msp430_vif.monitor_if_mp.monitor_cb.mem_add;
+
             // Send transaction to Scoreboard
             Mon2Sb_port.write(pros_trans);
-            // Send transaction to subscriber		
-            aport.write(pros_trans);	   
+
+            // Send transaction to subscriber
+            aport.write(pros_trans);
             count = 0;             
           end
         end
