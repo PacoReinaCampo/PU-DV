@@ -39,14 +39,14 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_driver extends uvm_driver #(processor_transaction);
+class msp430_driver extends uvm_driver #(msp430_transaction);
 
-  `uvm_component_utils(processor_driver)
+  `uvm_component_utils(msp430_driver)
 
-  virtual processor_interface processor_vif;
+  virtual msp430_interface msp430_vif;
 
   // Analysis port to broadcast input values to scoreboard
-  uvm_analysis_port #(processor_transaction) Drv2Sb_port;
+  uvm_analysis_port #(msp430_transaction) Drv2Sb_port;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -55,7 +55,7 @@ class processor_driver extends uvm_driver #(processor_transaction);
 
   function void build_phase(uvm_phase phase);
     // Get interface reference from config database
-    if(!uvm_config_db#(virtual processor_interface)::get(this, "", "processor_vif", processor_vif)) begin
+    if(!uvm_config_db#(virtual msp430_interface)::get(this, "", "msp430_vif", msp430_vif)) begin
       `uvm_error("", "uvm_config_db::get failed")
     end
     drv_clk=1'b0;
@@ -89,14 +89,14 @@ class processor_driver extends uvm_driver #(processor_transaction);
 
     // Now drive normal traffic
     forever begin
-      @(processor_vif.driver_if_mp.driver_cb) begin 
+      @(msp430_vif.driver_if_mp.driver_cb) begin 
         if(count < 19) begin
-          processor_vif.driver_if_mp.driver_cb.inst_in <= mem[count] ;
+          msp430_vif.driver_if_mp.driver_cb.inst_in <= mem[count] ;
           count++;
         end
         else begin
           seq_item_port.get_next_item(req);
-          processor_vif.driver_if_mp.driver_cb.inst_in <= req.instrn ;
+          msp430_vif.driver_if_mp.driver_cb.inst_in <= req.instrn ;
           Drv2Sb_port.write(req);
           seq_item_port.item_done();
           count = 0;
@@ -104,4 +104,4 @@ class processor_driver extends uvm_driver #(processor_transaction);
       end
     end
   endtask
-endclass: processor_driver
+endclass: msp430_driver

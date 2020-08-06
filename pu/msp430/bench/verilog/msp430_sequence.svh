@@ -39,8 +39,8 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_transaction extends uvm_sequence_item;
-  `uvm_object_utils(processor_transaction)
+class msp430_transaction extends uvm_sequence_item;
+  `uvm_object_utils(msp430_transaction)
   rand bit [15:0] instrn;
 
   bit [ 7:0] pc;
@@ -60,9 +60,9 @@ class processor_transaction extends uvm_sequence_item;
   function new (string name = "");
     super.new(name);
   endfunction
-endclass: processor_transaction
+endclass: msp430_transaction
 
-class inst_sequence extends uvm_sequence#(processor_transaction);
+class inst_sequence extends uvm_sequence#(msp430_transaction);
   `uvm_object_utils(inst_sequence)
 
   function new (string name = "");
@@ -71,9 +71,9 @@ class inst_sequence extends uvm_sequence#(processor_transaction);
 
   bit [15:0] inst;
 
-  //processor_transaction req;
+  //msp430_transaction req;
   task body;
-    req = processor_transaction::type_id::create("req");
+    req = msp430_transaction::type_id::create("req");
     start_item(req);
 
     if (!req.randomize()) begin
@@ -86,8 +86,8 @@ class inst_sequence extends uvm_sequence#(processor_transaction);
   endtask: body
 endclass: inst_sequence
 
-class processor_sequence extends uvm_sequence#(processor_transaction);
-  `uvm_object_utils(processor_sequence)
+class msp430_sequence extends uvm_sequence#(msp430_transaction);
+  `uvm_object_utils(msp430_sequence)
 
   function new (string name = "");
     super.new(name);
@@ -102,4 +102,4 @@ class processor_sequence extends uvm_sequence#(processor_transaction);
       inst_seq.start(m_sequencer);
     end
   endtask: body
-endclass: processor_sequence
+endclass: msp430_sequence

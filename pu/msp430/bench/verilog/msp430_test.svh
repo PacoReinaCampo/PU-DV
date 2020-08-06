@@ -39,19 +39,19 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_test extends uvm_test;
- `uvm_component_utils(processor_test)
+class msp430_test extends uvm_test;
+ `uvm_component_utils(msp430_test)
   
-  processor_env env;
-  processor_sequence processor_seq;
+  msp430_env env;
+  msp430_sequence msp430_seq;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
   
   function void build_phase(uvm_phase phase);
-    env = processor_env::type_id::create("env", this);
-    processor_seq = processor_sequence::type_id::create("processor_seq");
+    env = msp430_env::type_id::create("env", this);
+    msp430_seq = msp430_sequence::type_id::create("msp430_seq");
  endfunction
 
   function void end_of_elaboration_phase(uvm_phase phase);
@@ -64,7 +64,7 @@ class processor_test extends uvm_test;
     `uvm_warning("", "processor test!")
     #10;
    
-    processor_seq.start(env.agent.sequencer);
+    msp430_seq.start(env.agent.sequencer);
     #1000;
 
     // We drop objection to allow the test to complete

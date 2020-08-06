@@ -39,9 +39,9 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_subscriber extends uvm_subscriber #(processor_transaction);
+class msp430_subscriber extends uvm_subscriber #(msp430_transaction);
   //Register subscriber in uvm factory
-  `uvm_component_utils(processor_subscriber)
+  `uvm_component_utils(msp430_subscriber)
 
   //Define variables to store read/write request and address
   bit [15:0] instruction;
@@ -68,10 +68,10 @@ class processor_subscriber extends uvm_subscriber #(processor_transaction);
   endgroup
 
   //Declare virtual interface object
-  virtual processor_interface processor_vif;
+  virtual msp430_interface msp430_vif;
 
   //Declare analysis port to get transactions from monitor
-  uvm_analysis_imp #(processor_transaction,processor_subscriber) aport;
+  uvm_analysis_imp #(msp430_transaction,msp430_subscriber) aport;
 
   function new (string name, uvm_component parent);
     begin
@@ -84,7 +84,7 @@ class processor_subscriber extends uvm_subscriber #(processor_transaction);
 
   function void build_phase(uvm_phase phase);
     // Get virtual interface reference from config database
-    if(!uvm_config_db#(virtual processor_interface)::get(this, "", "processor_vif", processor_vif)) begin
+    if(!uvm_config_db#(virtual msp430_interface)::get(this, "", "msp430_vif", msp430_vif)) begin
       `uvm_error("", "uvm_config_db::get failed")
     end
 
@@ -93,7 +93,7 @@ class processor_subscriber extends uvm_subscriber #(processor_transaction);
   endfunction 
 
   //Write function for the analysis port
-  function void write(processor_transaction t);
+  function void write(msp430_transaction t);
     instruction = t.inst_out;
     cover_processor.sample();
   endfunction
