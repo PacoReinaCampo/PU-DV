@@ -39,35 +39,36 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_test extends uvm_test;
- `uvm_component_utils(processor_test)
-  
-  processor_env env;
-  processor_sequence processor_seq;
+class riscv_env extends uvm_env;
+  `uvm_component_utils(riscv_env)
+
+  riscv_agent agent;
+  riscv_monitor mon;
+  riscv_scoreboard sb;
+  riscv_subscriber sub;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
-  
+
   function void build_phase(uvm_phase phase);
-    env = processor_env::type_id::create("env", this);
-    processor_seq = processor_sequence::type_id::create("processor_seq");
- endfunction
+    agent = riscv_agent::type_id::create("agent", this);
+    mon   = riscv_monitor::type_id::create("mon", this);
+    sb    = riscv_scoreboard::type_id::create("sb", this);
+    sub   = riscv_subscriber::type_id::create("sub", this);
+  endfunction
 
-  function void end_of_elaboration_phase(uvm_phase phase);
-    print();
-  endfunction 
+  // connect ports of various TB components here
+  function void connect_phase(uvm_phase phase);
+    `uvm_info("", "Called env::connect_phase", UVM_NONE);
 
-  task run_phase(uvm_phase phase);
-    // We raise objection to keep the test from completing
-    phase.raise_objection(this);
-    `uvm_warning("", "processor test!")
-    #10;
-   
-    processor_seq.start(env.agent.sequencer);
-    #1000;
+    // connect driver's analysis port to scoreboard's analysis implementation port
+    agent.driver.Drv2Sb_port.connect(sb.Drv2Sb_port);
 
-    // We drop objection to allow the test to complete
-    phase.drop_objection(this);
-  endtask
+    // connect monitor's analysis port to scoreboard's analysis implementation port
+    mon.Mon2Sb_port.connect(sb.Mon2Sb_port);
+
+    // connect monitor's analysis port to subscriber's analysis implementation port
+    mon.aport.connect(sub.aport);
+  endfunction: connect_phase
 endclass

@@ -42,20 +42,19 @@
 `uvm_analysis_imp_decl(_mon_trans)
 `uvm_analysis_imp_decl(_drv_trans)
 
-class processor_scoreboard extends uvm_scoreboard;
-
+class or1k_scoreboard extends uvm_scoreboard;
   // register the scoreboard in the UVM factory
-  `uvm_component_utils(processor_scoreboard);
+  `uvm_component_utils(or1k_scoreboard);
 
-  //processor_transaction trans, input_trans;
+  //or1k_transaction trans, input_trans;
 
   // analysis implementation ports
-  uvm_analysis_imp_mon_trans #(processor_transaction,processor_scoreboard) Mon2Sb_port;
-  uvm_analysis_imp_drv_trans #(processor_transaction,processor_scoreboard) Drv2Sb_port;
+  uvm_analysis_imp_mon_trans #(or1k_transaction,or1k_scoreboard) Mon2Sb_port;
+  uvm_analysis_imp_drv_trans #(or1k_transaction,or1k_scoreboard) Drv2Sb_port;
 
   // TLM FIFOs to store the actual and expected transaction values
-  uvm_tlm_fifo #(processor_transaction)  drv_fifo;
-  uvm_tlm_fifo #(processor_transaction)  mon_fifo;
+  uvm_tlm_fifo #(or1k_transaction)  drv_fifo;
+  uvm_tlm_fifo #(or1k_transaction)  mon_fifo;
 
   function new (string name, uvm_component parent);
     super.new(name, parent);
@@ -66,24 +65,22 @@ class processor_scoreboard extends uvm_scoreboard;
     //Instantiate the analysis ports and Fifo
     Mon2Sb_port = new("Mon2Sb",  this);
     Drv2Sb_port = new("Drv2Sb",  this);
-    drv_fifo     = new("drv_fifo", this,8);
-    mon_fifo     = new("mon_fifo", this,8);
+    drv_fifo    = new("drv_fifo", this, 8);
+    mon_fifo    = new("mon_fifo", this, 8);
   endfunction : build_phase
 
-  // write_drv_trans will be called when the driver broadcasts a transaction
-  // to the scoreboard
-  function void write_drv_trans (processor_transaction input_trans);
+  // write_drv_trans will be called when the driver broadcasts a transaction to the scoreboard
+  function void write_drv_trans (or1k_transaction input_trans);
     void'(drv_fifo.try_put(input_trans));
   endfunction : write_drv_trans
 
-  // write_mon_trans will be called when the monitor broadcasts the DUT results
-  // to the scoreboard 
-  function void write_mon_trans (processor_transaction trans);
+  // write_mon_trans will be called when the monitor broadcasts the DUT results to the scoreboard 
+  function void write_mon_trans (or1k_transaction trans);
     void'(mon_fifo.try_put(trans));
   endfunction : write_mon_trans
 
   task run_phase(uvm_phase phase);
-    processor_transaction exp_trans, out_trans;
+    or1k_transaction exp_trans, out_trans;
     reg [15:0]file[0:7];
     bit [15:0]h1,i1,i2; 
     bit [7:0]dir;
@@ -96,6 +93,7 @@ class processor_scoreboard extends uvm_scoreboard;
       dir=0;
       s1=0;
       s2=0;
+
       //Initialize Reg File
       file[0] = 16'h0435;
       file[1] = 16'h407F;
@@ -105,15 +103,8 @@ class processor_scoreboard extends uvm_scoreboard;
       file[5] = 16'h4073;
       file[6] = 16'h82BC;
       file[7] = 16'hD4C1;
+
       //Compare Instructions
-      /*
-instrn[15:12]=> OPCODE
-instrn[11]=> CTRL
-instrn[10:9]=>RECONFIG
-instrn[8:6]=>DESTINATION
-instrn[5:3]=>Source 1
-instrn[2:0]=>Source 2
-*/
       if(exp_trans.instrn == out_trans.inst_out) begin  //FULL INST CHECK
         `uvm_info ("INSTRUCTION_WORD_PASS ", $sformatf("Actual Instruction=%h Expected Instruction=%h \n",out_trans.inst_out, exp_trans.instrn), UVM_LOW)
         if(exp_trans.instrn[8:6]==out_trans.reg_add) begin  //DESTINATION REG CHECK
@@ -319,4 +310,4 @@ instrn[2:0]=>Source 2
       end    
     end
   endtask
-endclass : processor_scoreboard
+endclass : or1k_scoreboard

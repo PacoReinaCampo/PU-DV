@@ -45,45 +45,114 @@
 import uvm_pkg::*;
 
 //Include common files
-`include "processor_sequence.sv"
-`include "processor_driver.sv"
-`include "processor_monitor.sv"
-`include "processor_scoreboard.sv"
-`include "processor_subscriber.sv"
-`include "processor_agent.sv"
-`include "processor_env.sv"
-`include "processor_test.sv"
+`include "riscv_sequence.svh"
+`include "riscv_driver.svh"
+`include "riscv_monitor.svh"
+`include "riscv_scoreboard.svh"
+`include "riscv_subscriber.svh"
+`include "riscv_agent.svh"
+`include "riscv_env.svh"
+`include "riscv_test.svh"
 
-module top;  
-  bit clk;
-  
-  //clock generation
-  always #5 clk = ~clk;
+`include "riscv_mpsoc_pkg.sv"
+
+module test;
+
+  // Instantiate interface
+  riscv_interface riscv_if();
+
+  // Instantiate dut
+  riscv_core #(
+    .XLEN                  ( XLEN                  ),
+    .PLEN                  ( PLEN                  ),
+    .HAS_USER              ( HAS_USER              ),
+    .HAS_SUPER             ( HAS_SUPER             ),
+    .HAS_HYPER             ( HAS_HYPER             ),
+    .HAS_BPU               ( HAS_BPU               ),
+    .HAS_FPU               ( HAS_FPU               ),
+    .HAS_MMU               ( HAS_MMU               ),
+    .HAS_RVM               ( HAS_RVM               ),
+    .HAS_RVA               ( HAS_RVA               ),
+    .HAS_RVC               ( HAS_RVC               ),
+    .IS_RV32E              ( IS_RV32E              ),
+
+    .MULT_LATENCY          ( MULT_LATENCY          ),
+
+    .BREAKPOINTS           ( BREAKPOINTS           ),
+    .PMP_CNT               ( PMP_CNT               ),
+
+    .BP_GLOBAL_BITS        ( BP_GLOBAL_BITS        ),
+    .BP_LOCAL_BITS         ( BP_LOCAL_BITS         ),
+
+    .TECHNOLOGY            ( TECHNOLOGY            ),
+
+    .MNMIVEC_DEFAULT       ( MNMIVEC_DEFAULT       ),
+    .MTVEC_DEFAULT         ( MTVEC_DEFAULT         ),
+    .HTVEC_DEFAULT         ( HTVEC_DEFAULT         ),
+    .STVEC_DEFAULT         ( STVEC_DEFAULT         ),
+    .UTVEC_DEFAULT         ( UTVEC_DEFAULT         ),
+
+    .JEDEC_BANK            ( JEDEC_BANK            ),
+    .JEDEC_MANUFACTURER_ID ( JEDEC_MANUFACTURER_ID ),
+
+    .HARTID                ( HARTID                ), 
+
+    .PC_INIT               ( PC_INIT               ),
+    .PARCEL_SIZE           ( PARCEL_SIZE           )
+  )
+  dut (
+    .rstn                 ( riscv_if.HRESETn              ),
+    .clk                  ( riscv_if.HCLK                 ),
+
+    .if_stall_nxt_pc      ( riscv_if.if_stall_nxt_pc      ),
+    .if_nxt_pc            ( riscv_if.if_nxt_pc            ),
+    .if_stall             ( riscv_if.if_stall             ),
+    .if_flush             ( riscv_if.if_flush             ),
+    .if_parcel            ( riscv_if.if_parcel            ),
+    .if_parcel_pc         ( riscv_if.if_parcel_pc         ),
+    .if_parcel_valid      ( riscv_if.if_parcel_valid      ),
+    .if_parcel_misaligned ( riscv_if.if_parcel_misaligned ),
+    .if_parcel_page_fault ( riscv_if.if_parcel_page_fault ),
+    .dmem_adr             ( riscv_if.dmem_adr             ),
+    .dmem_d               ( riscv_if.dmem_d               ),
+    .dmem_q               ( riscv_if.dmem_q               ),
+    .dmem_we              ( riscv_if.dmem_we              ),
+    .dmem_size            ( riscv_if.dmem_size            ),
+    .dmem_req             ( riscv_if.dmem_req             ),
+    .dmem_ack             ( riscv_if.dmem_ack             ),
+    .dmem_err             ( riscv_if.dmem_err             ),
+    .dmem_misaligned      ( riscv_if.dmem_misaligned      ),
+    .dmem_page_fault      ( riscv_if.dmem_page_fault      ),
+    .st_prv               ( riscv_if.st_prv               ),
+    .st_pmpcfg            ( riscv_if.st_pmpcfg            ),
+    .st_pmpaddr           ( riscv_if.st_pmpaddr           ),
+
+    .bu_cacheflush        ( riscv_if.cacheflush           ),
+
+    .ext_nmi              ( riscv_if.ext_nmi              ),
+    .ext_tint             ( riscv_if.ext_tint             ),
+    .ext_sint             ( riscv_if.ext_sint             ),
+    .ext_int              ( riscv_if.ext_int              ),
+    .dbg_stall            ( riscv_if.dbg_stall            ),
+    .dbg_strb             ( riscv_if.dbg_strb             ),
+    .dbg_we               ( riscv_if.dbg_we               ),
+    .dbg_addr             ( riscv_if.dbg_addr             ),
+    .dbg_dati             ( riscv_if.dbg_dati             ),
+    .dbg_dato             ( riscv_if.dbg_dato             ),
+    .dbg_ack              ( riscv_if.dbg_ack              ),
+    .dbg_bp               ( riscv_if.dbg_bp               )
+  ); 
+
+  //Clock generation
+  always #5 riscv_if.dbg_clk = ~riscv_if.dbg_clk;
   
   initial begin
-    clk = 0;
+    riscv_if.dbg_clk = 0;
   end
-
-  // Instantiate the interface
-  processor_interface processor_if(clk);
-  // Instantiate dut
-
-  Main_Processor dut(
-    .inst_in     (processor_if.inst_in),
-    .clk         (processor_if.clk),
-    .pc_out      (processor_if.pc),
-    .inst_out_tb (processor_if.inst_out),
-    .wD_rf       (processor_if.reg_data),
-    .w_en        (processor_if.reg_en),
-    .aD_rf       (processor_if.reg_add),
-    .mem_data_tb (processor_if.mem_data),
-    .mem_en_tb   (processor_if.mem_en),
-    .mem_add_tb  (processor_if.mem_add) 
-  );
 
   initial begin
     // Place the interface into the UVM configuration database
-    uvm_config_db#(virtual processor_interface)::set(null, "*", "processor_vif", processor_if);
+    uvm_config_db#(virtual riscv_interface)::set(null, "*", "riscv_vif", riscv_if);
     
     // Start the test
     run_test();

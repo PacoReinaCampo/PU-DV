@@ -39,69 +39,62 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_driver extends uvm_driver #(processor_transaction);
+class riscv_subscriber extends uvm_subscriber #(riscv_transaction);
+  // Register subscriber in uvm factory
+  `uvm_component_utils(riscv_subscriber)
 
-  `uvm_component_utils(processor_driver)
+  // Define variables to store read/write request and address
+  bit [15:0] instruction;
 
-  virtual processor_interface processor_vif;
+  // Define covergroup and coverpoints
+  covergroup cover_processor;
+    coverpoint instruction {
+      bins Addition       = {[16'h0000:16'h0FFF]};
+      bins Subraction     = {[16'h1000:16'h1FFF]};
+      bins Increment      = {[16'h3000:16'h3FFF]};
+      bins Decrement      = {[16'h2000:16'h2FFF]};
+      bins AND_NAND       = {[16'h4000:16'h4FFF]};
+      bins OR_NOR         = {[16'h5000:16'h5FFF]};
+      bins EXOR_EXNOR     = {[16'h6000:16'h6FFF]};
+      bins Buff_Inv       = {[16'h7000:16'h7FFF]};
+      bins Multiplication = {[16'h8000:16'h8FFF]};
+      bins ShiftL_ShiftR  = {[16'hC000:16'hCFFF]};
+      bins Load           = {[16'hA000:16'hAFFF]};
+      bins Store          = {[16'hB000:16'hBFFF]};
+      bins Move_MoveI     = {[16'h9000:16'h9FFF]};
+      bins Jump           = {[16'hD000:16'hDFFF]};
+      bins NOP            = {[16'hE000:16'hEFFF]};
+    }
+  endgroup
 
-  // Analysis port to broadcast input values to scoreboard
-  uvm_analysis_port #(processor_transaction) Drv2Sb_port;
+  // Declare virtual interface object
+  virtual riscv_interface riscv_vif;
 
-  function new(string name, uvm_component parent);
-    super.new(name, parent);
+  // Declare analysis port to get transactions from monitor
+  uvm_analysis_imp #(riscv_transaction,riscv_subscriber) aport;
+
+  function new (string name, uvm_component parent);
+    begin
+      super.new(name,parent);
+
+      // Call new for covergroup
+      cover_processor = new();
+    end
   endfunction
-  bit drv_clk;
 
   function void build_phase(uvm_phase phase);
-    // Get interface reference from config database
-    if(!uvm_config_db#(virtual processor_interface)::get(this, "", "processor_vif", processor_vif)) begin
+    // Get virtual interface reference from config database
+    if(!uvm_config_db#(virtual riscv_interface)::get(this, "", "riscv_vif", riscv_vif)) begin
       `uvm_error("", "uvm_config_db::get failed")
     end
-    drv_clk=1'b0;
-    Drv2Sb_port = new("Drv2Sb",this);
+
+    // Instantiate analysis port
+    aport = new("aport", this);
   endfunction 
 
-  task run_phase(uvm_phase phase);
-    reg[15:0]mem[0:18];
-    int count = 0;
-
-    //Set initial instructions.txt file
-    mem[0]=16'h9A35;
-    mem[1]=16'h9A7F;
-    mem[2]=16'h9A85;
-    mem[3]=16'h9AC0;
-    mem[4]=16'h9B0B;
-    mem[5]=16'h9B73;
-    mem[6]=16'h9BBC;
-    mem[7]=16'h9BC1;
-    mem[8]=16'h9C04;
-    mem[9]=16'h9C40;
-    mem[10]=16'h9C81;
-    mem[11]=16'h9CEB;
-    mem[12]=16'h9D11;
-    mem[13]=16'h9D40;
-    mem[14]=16'h9D82;
-    mem[15]=16'h9DD4;
-    mem[16]=16'h0000;
-    mem[17]=16'h0000;
-    mem[18]=16'h0000;
-
-    // Now drive normal traffic
-    forever begin
-      @(processor_vif.driver_if_mp.driver_cb) begin 
-        if(count < 19) begin
-          processor_vif.driver_if_mp.driver_cb.inst_in <= mem[count] ;
-          count++;
-        end
-        else begin
-          seq_item_port.get_next_item(req);
-          processor_vif.driver_if_mp.driver_cb.inst_in <= req.instrn ;
-          Drv2Sb_port.write(req);
-          seq_item_port.item_done();
-          count = 0;
-        end
-      end
-    end
-  endtask
-endclass: processor_driver
+  // Write function for the analysis port
+  function void write(riscv_transaction t);
+    instruction = t.inst_out;
+    cover_processor.sample();
+  endfunction
+endclass

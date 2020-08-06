@@ -39,60 +39,62 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_monitor extends uvm_monitor;
-  // register the monitor in the UVM factory
-  `uvm_component_utils(processor_monitor)
-  int count;
+class or1k_subscriber extends uvm_subscriber #(or1k_transaction);
+  // Register subscriber in uvm factory
+  `uvm_component_utils(or1k_subscriber)
 
-  // Declare virtual interface
-  virtual processor_interface processor_vif;
+  // Define variables to store read/write request and address
+  bit [15:0] instruction;
 
-  // Analysis port to broadcast results to scoreboard 
-  uvm_analysis_port #(processor_transaction) Mon2Sb_port; 
+  // Define covergroup and coverpoints
+  covergroup cover_processor;
+    coverpoint instruction {
+      bins Addition       = {[16'h0000:16'h0FFF]};
+      bins Subraction     = {[16'h1000:16'h1FFF]};
+      bins Increment      = {[16'h3000:16'h3FFF]};
+      bins Decrement      = {[16'h2000:16'h2FFF]};
+      bins AND_NAND       = {[16'h4000:16'h4FFF]};
+      bins OR_NOR         = {[16'h5000:16'h5FFF]};
+      bins EXOR_EXNOR     = {[16'h6000:16'h6FFF]};
+      bins Buff_Inv       = {[16'h7000:16'h7FFF]};
+      bins Multiplication = {[16'h8000:16'h8FFF]};
+      bins ShiftL_ShiftR  = {[16'hC000:16'hCFFF]};
+      bins Load           = {[16'hA000:16'hAFFF]};
+      bins Store          = {[16'hB000:16'hBFFF]};
+      bins Move_MoveI     = {[16'h9000:16'h9FFF]};
+      bins Jump           = {[16'hD000:16'hDFFF]};
+      bins NOP            = {[16'hE000:16'hEFFF]};
+    }
+  endgroup
 
-  // Analysis port to broadcast results to subscriber 
-  uvm_analysis_port #(processor_transaction) aport;     
-  function new(string name, uvm_component parent);
-    super.new(name, parent);
+  // Declare virtual interface object
+  virtual or1k_interface or1k_vif;
+
+  // Declare analysis port to get transactions from monitor
+  uvm_analysis_imp #(or1k_transaction,or1k_subscriber) aport;
+
+  function new (string name, uvm_component parent);
+    begin
+      super.new(name,parent);
+
+      // Call new for covergroup
+      cover_processor = new();
+    end
   endfunction
 
   function void build_phase(uvm_phase phase);
-    // Get interface reference from config database
-    if(!uvm_config_db#(virtual processor_interface)::get(this, "", "processor_vif", processor_vif)) begin
+    // Get virtual interface reference from config database
+    if(!uvm_config_db#(virtual or1k_interface)::get(this, "", "or1k_vif", or1k_vif)) begin
       `uvm_error("", "uvm_config_db::get failed")
     end
-    Mon2Sb_port = new("Mon2Sb",this);
-    aport = new("aport",this);
-  endfunction
 
-  task run_phase(uvm_phase phase);
-    processor_transaction pros_trans;
-    pros_trans = new ("trans");
-    count = 0;
-    fork
-      forever begin
-        @(processor_vif.monitor_if_mp.monitor_cb.inst_out) begin
-          if(count<17) begin
-            count++;
-          end
-          else begin
-            // Set transaction from interface data
-            pros_trans.pc = processor_vif.monitor_if_mp.monitor_cb.pc;
-            pros_trans.inst_out = processor_vif.monitor_if_mp.monitor_cb.inst_out;
-            pros_trans.reg_data = processor_vif.monitor_if_mp.monitor_cb.reg_data;
-            pros_trans.reg_en = processor_vif.monitor_if_mp.monitor_cb.reg_en;
-            pros_trans.reg_add = processor_vif.monitor_if_mp.monitor_cb.reg_add;
-            pros_trans.mem_data = processor_vif.monitor_if_mp.monitor_cb.mem_data;
-            pros_trans.mem_en = processor_vif.monitor_if_mp.monitor_cb.mem_en;						
-            pros_trans.mem_add = processor_vif.monitor_if_mp.monitor_cb.mem_add;			
-            // Send transaction to Scoreboard
-            Mon2Sb_port.write(pros_trans);
-            // Send transaction to subscriber		
-            aport.write(pros_trans);	   
-            count = 0;             
-          end
-        end
-      end
-    join
-  endtask : run_phase
-endclass : processor_monitor
+    // Instantiate analysis port
+    aport = new("aport", this);
+  endfunction 
+
+  // Write function for the analysis port
+  function void write(or1k_transaction t);
+    instruction = t.inst_out;
+    cover_processor.sample();
+  endfunction
+endclass

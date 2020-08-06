@@ -39,60 +39,68 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_monitor extends uvm_monitor;
-  // register the monitor in the UVM factory
-  `uvm_component_utils(processor_monitor)
-  int count;
+class or1k_transaction extends uvm_sequence_item;
+  `uvm_object_utils(or1k_transaction)
 
-  // Declare virtual interface
-  virtual processor_interface processor_vif;
+  rand bit [15:0] instrn;
 
-  // Analysis port to broadcast results to scoreboard 
-  uvm_analysis_port #(processor_transaction) Mon2Sb_port; 
+  bit [ 7:0] pc;
+  bit [15:0] inst_out;
+  bit [15:0] reg_data;
+  bit [ 1:0] reg_en;
+  bit [ 2:0] reg_add;
+  bit [15:0] mem_data;
+  bit        mem_en;
+  bit [ 2:0] mem_add;
 
-  // Analysis port to broadcast results to subscriber 
-  uvm_analysis_port #(processor_transaction) aport;     
-  function new(string name, uvm_component parent);
-    super.new(name, parent);
+  constraint input_constraint {
+    //Cosntraint to prevent EOF operation
+    instrn inside {[16'h0000:16'hEFFF]};
+  }
+
+  function new (string name = "");
+    super.new(name);
+  endfunction
+endclass: or1k_transaction
+
+class inst_sequence extends uvm_sequence#(or1k_transaction);
+  `uvm_object_utils(inst_sequence)
+
+  function new (string name = "");
+    super.new(name);
   endfunction
 
-  function void build_phase(uvm_phase phase);
-    // Get interface reference from config database
-    if(!uvm_config_db#(virtual processor_interface)::get(this, "", "processor_vif", processor_vif)) begin
-      `uvm_error("", "uvm_config_db::get failed")
+  bit [15:0] inst;
+
+  //or1k_transaction req;
+  task body;
+    req = or1k_transaction::type_id::create("req");
+    start_item(req);
+
+    if (!req.randomize()) begin
+      `uvm_error("Instruction Sequence", "Randomize failed.");
     end
-    Mon2Sb_port = new("Mon2Sb",this);
-    aport = new("aport",this);
+
+    inst = req.instrn;
+
+    finish_item(req);
+  endtask: body
+endclass: inst_sequence
+
+class or1k_sequence extends uvm_sequence#(or1k_transaction);
+  `uvm_object_utils(or1k_sequence)
+
+  function new (string name = "");
+    super.new(name);
   endfunction
 
-  task run_phase(uvm_phase phase);
-    processor_transaction pros_trans;
-    pros_trans = new ("trans");
-    count = 0;
-    fork
-      forever begin
-        @(processor_vif.monitor_if_mp.monitor_cb.inst_out) begin
-          if(count<17) begin
-            count++;
-          end
-          else begin
-            // Set transaction from interface data
-            pros_trans.pc = processor_vif.monitor_if_mp.monitor_cb.pc;
-            pros_trans.inst_out = processor_vif.monitor_if_mp.monitor_cb.inst_out;
-            pros_trans.reg_data = processor_vif.monitor_if_mp.monitor_cb.reg_data;
-            pros_trans.reg_en = processor_vif.monitor_if_mp.monitor_cb.reg_en;
-            pros_trans.reg_add = processor_vif.monitor_if_mp.monitor_cb.reg_add;
-            pros_trans.mem_data = processor_vif.monitor_if_mp.monitor_cb.mem_data;
-            pros_trans.mem_en = processor_vif.monitor_if_mp.monitor_cb.mem_en;						
-            pros_trans.mem_add = processor_vif.monitor_if_mp.monitor_cb.mem_add;			
-            // Send transaction to Scoreboard
-            Mon2Sb_port.write(pros_trans);
-            // Send transaction to subscriber		
-            aport.write(pros_trans);	   
-            count = 0;             
-          end
-        end
-      end
-    join
-  endtask : run_phase
-endclass : processor_monitor
+  inst_sequence inst_seq;
+
+  task body;
+    //LOOP relative to use case (say 256)
+    for(int i =0;i<10000;i++) begin
+      inst_seq = inst_sequence::type_id::create("inst_seq");
+      inst_seq.start(m_sequencer);
+    end
+  endtask: body
+endclass: or1k_sequence

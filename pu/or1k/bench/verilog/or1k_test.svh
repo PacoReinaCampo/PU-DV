@@ -39,23 +39,35 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_agent extends uvm_agent;
-  `uvm_component_utils(processor_agent)
-    
-  processor_driver driver;
-  uvm_sequencer#(processor_transaction) sequencer;
-    
+class or1k_test extends uvm_test;
+ `uvm_component_utils(or1k_test)
+  
+  or1k_env env;
+  or1k_sequence or1k_seq;
+
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
-    
+  
   function void build_phase(uvm_phase phase);
-    driver = processor_driver::type_id::create("driver", this);
-    sequencer = uvm_sequencer#(processor_transaction)::type_id::create("sequencer", this);
-  endfunction
-    
-  // In UVM connect phase, we connect the sequencer to the driver.
-  function void connect_phase(uvm_phase phase);
-    driver.seq_item_port.connect(sequencer.seq_item_export);
-  endfunction
+    env = or1k_env::type_id::create("env", this);
+    or1k_seq = or1k_sequence::type_id::create("or1k_seq");
+ endfunction
+
+  function void end_of_elaboration_phase(uvm_phase phase);
+    print();
+  endfunction 
+
+  task run_phase(uvm_phase phase);
+    // We raise objection to keep the test from completing
+    phase.raise_objection(this);
+    `uvm_warning("", "processor test!")
+    #10;
+   
+    or1k_seq.start(env.agent.sequencer);
+    #1000;
+
+    // We drop objection to allow the test to complete
+    phase.drop_objection(this);
+  endtask
 endclass

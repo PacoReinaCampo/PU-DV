@@ -39,62 +39,68 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-class processor_subscriber extends uvm_subscriber #(processor_transaction);
-  //Register subscriber in uvm factory
-  `uvm_component_utils(processor_subscriber)
+class riscv_transaction extends uvm_sequence_item;
+  `uvm_object_utils(riscv_transaction)
 
-  //Define variables to store read/write request and address
-  bit [15:0] instruction;
+  rand bit [15:0] instrn;
 
-  //Define covergroup and coverpoints
-  covergroup cover_processor;
-    coverpoint instruction {
-      bins Addition = {[16'h0000:16'h0FFF]};
-      bins Subraction = {[16'h1000:16'h1FFF]};
-      bins Increment = {[16'h3000:16'h3FFF]};
-      bins Decrement = {[16'h2000:16'h2FFF]};
-      bins AND_NAND = {[16'h4000:16'h4FFF]};
-      bins OR_NOR = {[16'h5000:16'h5FFF]};
-      bins EXOR_EXNOR = {[16'h6000:16'h6FFF]};
-      bins Buff_Inv = {[16'h7000:16'h7FFF]};
-      bins Multiplication = {[16'h8000:16'h8FFF]};
-      bins ShiftL_ShiftR = {[16'hC000:16'hCFFF]};
-      bins Load = {[16'hA000:16'hAFFF]};
-      bins Store = {[16'hB000:16'hBFFF]};
-      bins Move_MoveI = {[16'h9000:16'h9FFF]};
-      bins Jump = {[16'hD000:16'hDFFF]};
-      bins NOP = {[16'hE000:16'hEFFF]};
-    }
-  endgroup
+  bit [ 7:0] pc;
+  bit [15:0] inst_out;
+  bit [15:0] reg_data;
+  bit [ 1:0] reg_en;
+  bit [ 2:0] reg_add;
+  bit [15:0] mem_data;
+  bit        mem_en;
+  bit [ 2:0] mem_add;
 
-  //Declare virtual interface object
-  virtual processor_interface processor_vif;
+  constraint input_constraint {
+    //Cosntraint to prevent EOF operation
+    instrn inside {[16'h0000:16'hEFFF]};
+  }
 
-  //Declare analysis port to get transactions from monitor
-  uvm_analysis_imp #(processor_transaction,processor_subscriber) aport;
+  function new (string name = "");
+    super.new(name);
+  endfunction
+endclass: riscv_transaction
 
-  function new (string name, uvm_component parent);
-    begin
-      super.new(name,parent);
+class inst_sequence extends uvm_sequence#(riscv_transaction);
+  `uvm_object_utils(inst_sequence)
 
-      //Call new for covergroup
-      cover_processor = new();
-    end
+  function new (string name = "");
+    super.new(name);
   endfunction
 
-  function void build_phase(uvm_phase phase);
-    // Get virtual interface reference from config database
-    if(!uvm_config_db#(virtual processor_interface)::get(this, "", "processor_vif", processor_vif)) begin
-      `uvm_error("", "uvm_config_db::get failed")
+  bit [15:0] inst;
+
+  //riscv_transaction req;
+  task body;
+    req = riscv_transaction::type_id::create("req");
+    start_item(req);
+
+    if (!req.randomize()) begin
+      `uvm_error("Instruction Sequence", "Randomize failed.");
     end
 
-    //Instantiate analysis port
-    aport = new("aport",this);
-  endfunction 
+    inst = req.instrn;
 
-  //Write function for the analysis port
-  function void write(processor_transaction t);
-    instruction = t.inst_out;
-    cover_processor.sample();
+    finish_item(req);
+  endtask: body
+endclass: inst_sequence
+
+class riscv_sequence extends uvm_sequence#(riscv_transaction);
+  `uvm_object_utils(riscv_sequence)
+
+  function new (string name = "");
+    super.new(name);
   endfunction
-endclass
+
+  inst_sequence inst_seq;
+
+  task body;
+    //LOOP relative to use case (say 256)
+    for(int i =0;i<10000;i++) begin
+      inst_seq = inst_sequence::type_id::create("inst_seq");
+      inst_seq.start(m_sequencer);
+    end
+  endtask: body
+endclass: riscv_sequence

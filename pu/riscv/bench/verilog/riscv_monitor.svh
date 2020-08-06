@@ -39,38 +39,64 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-interface processor_interface(input clk); 
-  //PC and Instruction word
-  logic [ 7:0] pc;
-  logic [15:0] inst_out;
-  logic [15:0] inst_in;
+class riscv_monitor extends uvm_monitor;
+  // register the monitor in the UVM factory
+  `uvm_component_utils(riscv_monitor)
+  int count;
 
-  //Register file Signals
-  logic [15:0] reg_data;
-  logic [ 1:0] reg_en;
-  logic [ 2:0] reg_add;
+  // Declare virtual interface
+  virtual riscv_interface riscv_vif;
 
-  //Data Memory Signals
-  logic [15:0] mem_data;
-  logic        mem_en;
-  logic [ 2:0] mem_add;
-  
-  clocking driver_cb @ (negedge clk);
-    output inst_in;
-  endclocking : driver_cb
-  
-  clocking monitor_cb @ (negedge clk);
-    input pc;
-    input inst_out;
-    input reg_data;
-    input reg_en;
-    input reg_add;
-    input mem_data;
-    input mem_en;
-    input mem_add;
-  endclocking : monitor_cb
+  // Analysis port to broadcast results to scoreboard 
+  uvm_analysis_port #(riscv_transaction) Mon2Sb_port;
 
-  modport driver_if_mp (clocking driver_cb);
-  modport monitor_if_mp (clocking monitor_cb);
-endinterface
+  // Analysis port to broadcast results to subscriber 
+  uvm_analysis_port #(riscv_transaction) aport;
+    
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
 
+  function void build_phase(uvm_phase phase);
+    // Get interface reference from config database
+    if(!uvm_config_db#(virtual riscv_interface)::get(this, "", "riscv_vif", riscv_vif)) begin
+      `uvm_error("", "uvm_config_db::get failed")
+    end
+
+    Mon2Sb_port = new("Mon2Sb",this);
+    aport = new("aport",this);
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    riscv_transaction pros_trans;
+    pros_trans = new ("trans");
+    count = 0;
+    fork
+      forever begin
+        @(riscv_vif.monitor_if_mp.monitor_cb.inst_out) begin
+          if(count<17) begin
+            count++;
+          end
+          else begin
+            // Set transaction from interface data
+            pros_trans.pc       = riscv_vif.monitor_if_mp.monitor_cb.pc;
+            pros_trans.inst_out = riscv_vif.monitor_if_mp.monitor_cb.inst_out;
+            pros_trans.reg_data = riscv_vif.monitor_if_mp.monitor_cb.reg_data;
+            pros_trans.reg_en   = riscv_vif.monitor_if_mp.monitor_cb.reg_en;
+            pros_trans.reg_add  = riscv_vif.monitor_if_mp.monitor_cb.reg_add;
+            pros_trans.mem_data = riscv_vif.monitor_if_mp.monitor_cb.mem_data;
+            pros_trans.mem_en   = riscv_vif.monitor_if_mp.monitor_cb.mem_en;
+            pros_trans.mem_add  = riscv_vif.monitor_if_mp.monitor_cb.mem_add;
+
+            // Send transaction to Scoreboard
+            Mon2Sb_port.write(pros_trans);
+
+            // Send transaction to subscriber
+            aport.write(pros_trans);
+            count = 0;
+          end
+        end
+      end
+    join
+  endtask : run_phase
+endclass : riscv_monitor
