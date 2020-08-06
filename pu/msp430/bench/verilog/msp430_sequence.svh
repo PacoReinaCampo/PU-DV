@@ -41,6 +41,7 @@
 
 class msp430_transaction extends uvm_sequence_item;
   `uvm_object_utils(msp430_transaction)
+
   rand bit [15:0] instrn;
 
   bit [ 7:0] pc;

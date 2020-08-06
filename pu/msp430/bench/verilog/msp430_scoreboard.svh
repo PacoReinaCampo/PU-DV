@@ -65,8 +65,8 @@ class msp430_scoreboard extends uvm_scoreboard;
     //Instantiate the analysis ports and Fifo
     Mon2Sb_port = new("Mon2Sb",  this);
     Drv2Sb_port = new("Drv2Sb",  this);
-    drv_fifo     = new("drv_fifo", this,8);
-    mon_fifo     = new("mon_fifo", this,8);
+    drv_fifo    = new("drv_fifo", this, 8);
+    mon_fifo    = new("mon_fifo", this, 8);
   endfunction : build_phase
 
   // write_drv_trans will be called when the driver broadcasts a transaction to the scoreboard

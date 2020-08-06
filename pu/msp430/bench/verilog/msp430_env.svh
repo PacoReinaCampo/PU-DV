@@ -53,9 +53,9 @@ class msp430_env extends uvm_env;
 
   function void build_phase(uvm_phase phase);
     agent = msp430_agent::type_id::create("agent", this);
-    mon   = msp430_monitor::type_id::create("mon",this);
-    sb    = msp430_scoreboard::type_id::create("sb",this);
-    sub   = msp430_subscriber::type_id::create("sub",this);
+    mon   = msp430_monitor::type_id::create("mon", this);
+    sb    = msp430_scoreboard::type_id::create("sb", this);
+    sub   = msp430_subscriber::type_id::create("sub", this);
   endfunction
 
   // connect ports of various TB components here

@@ -50,7 +50,7 @@ class msp430_agent extends uvm_agent;
   endfunction
     
   function void build_phase(uvm_phase phase);
-    driver = msp430_driver::type_id::create("driver", this);
+    driver    = msp430_driver::type_id::create("driver", this);
     sequencer = uvm_sequencer#(msp430_transaction)::type_id::create("sequencer", this);
   endfunction
     

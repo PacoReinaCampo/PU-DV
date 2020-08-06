@@ -45,14 +45,14 @@
 import uvm_pkg::*;
 
 //Include common files
-`include "msp430_agent.sv"
-`include "msp430_driver.sv"
-`include "msp430_env.sv"
-`include "msp430_monitor.sv"
-`include "msp430_scoreboard.sv"
-`include "msp430_sequence.sv"
-`include "msp430_subscriber.sv"
-`include "msp430_test.sv"
+//`include "msp430_agent.svh"
+//`include "msp430_driver.svh"
+//`include "msp430_env.svh"
+//`include "msp430_monitor.svh"
+//`include "msp430_scoreboard.svh"
+`include "msp430_sequence.svh"
+`include "msp430_subscriber.svh"
+//`include "msp430_test.svh"
 
 module test;
 

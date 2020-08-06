@@ -48,10 +48,11 @@ class msp430_monitor extends uvm_monitor;
   virtual msp430_interface msp430_vif;
 
   // Analysis port to broadcast results to scoreboard 
-  uvm_analysis_port #(msp430_transaction) Mon2Sb_port; 
+  uvm_analysis_port #(msp430_transaction) Mon2Sb_port;
 
   // Analysis port to broadcast results to subscriber 
-  uvm_analysis_port #(msp430_transaction) aport;     
+  uvm_analysis_port #(msp430_transaction) aport;
+    
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
@@ -61,6 +62,7 @@ class msp430_monitor extends uvm_monitor;
     if(!uvm_config_db#(virtual msp430_interface)::get(this, "", "msp430_vif", msp430_vif)) begin
       `uvm_error("", "uvm_config_db::get failed")
     end
+
     Mon2Sb_port = new("Mon2Sb",this);
     aport = new("aport",this);
   endfunction
@@ -77,21 +79,21 @@ class msp430_monitor extends uvm_monitor;
           end
           else begin
             // Set transaction from interface data
-            pros_trans.pc = msp430_vif.monitor_if_mp.monitor_cb.pc;
+            pros_trans.pc       = msp430_vif.monitor_if_mp.monitor_cb.pc;
             pros_trans.inst_out = msp430_vif.monitor_if_mp.monitor_cb.inst_out;
             pros_trans.reg_data = msp430_vif.monitor_if_mp.monitor_cb.reg_data;
-            pros_trans.reg_en = msp430_vif.monitor_if_mp.monitor_cb.reg_en;
-            pros_trans.reg_add = msp430_vif.monitor_if_mp.monitor_cb.reg_add;
+            pros_trans.reg_en   = msp430_vif.monitor_if_mp.monitor_cb.reg_en;
+            pros_trans.reg_add  = msp430_vif.monitor_if_mp.monitor_cb.reg_add;
             pros_trans.mem_data = msp430_vif.monitor_if_mp.monitor_cb.mem_data;
-            pros_trans.mem_en = msp430_vif.monitor_if_mp.monitor_cb.mem_en;
-            pros_trans.mem_add = msp430_vif.monitor_if_mp.monitor_cb.mem_add;
+            pros_trans.mem_en   = msp430_vif.monitor_if_mp.monitor_cb.mem_en;
+            pros_trans.mem_add  = msp430_vif.monitor_if_mp.monitor_cb.mem_add;
 
             // Send transaction to Scoreboard
             Mon2Sb_port.write(pros_trans);
 
             // Send transaction to subscriber
             aport.write(pros_trans);
-            count = 0;             
+            count = 0;
           end
         end
       end

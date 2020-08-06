@@ -3,9 +3,9 @@ rm -rf sim/verilog/bus/apb4/transcript
 rm -rf sim/verilog/bus/axi4/transcript
 rm -rf sim/verilog/bus/wb/transcript
 
-rm -rf sim/verilog/pu/msp430/transcript
-rm -rf sim/verilog/pu/or1k/transcript
-rm -rf sim/verilog/pu/riscv/transcript
+rm -rf sim/verilog/pu/msp430/msim/transcript
+rm -rf sim/verilog/pu/or1k/msim/transcript
+rm -rf sim/verilog/pu/riscv/msim/transcript
 
 
 rm -rf sim/verilog/bus/ahb3/work
@@ -13,6 +13,6 @@ rm -rf sim/verilog/bus/apb4/work
 rm -rf sim/verilog/bus/axi4/work
 rm -rf sim/verilog/bus/wb/work
 
-rm -rf sim/verilog/pu/msp430/work
-rm -rf sim/verilog/pu/or1k/work
-rm -rf sim/verilog/pu/riscv/work
+rm -rf sim/verilog/pu/msp430/msim/work
+rm -rf sim/verilog/pu/or1k/msim/work
+rm -rf sim/verilog/pu/riscv/msim/work

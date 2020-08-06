@@ -59,7 +59,9 @@ class msp430_driver extends uvm_driver #(msp430_transaction);
     if(!uvm_config_db#(virtual msp430_interface)::get(this, "", "msp430_vif", msp430_vif)) begin
       `uvm_error("", "uvm_config_db::get failed")
     end
-    drv_clk=1'b0;
+
+    drv_clk = 1'b0;
+
     Drv2Sb_port = new("Drv2Sb",this);
   endfunction 
 
@@ -93,12 +95,12 @@ class msp430_driver extends uvm_driver #(msp430_transaction);
     forever begin
       @(msp430_vif.driver_if_mp.driver_cb) begin 
         if(count < 19) begin
-          msp430_vif.driver_if_mp.driver_cb.inst_in <= mem[count] ;
+          msp430_vif.driver_if_mp.driver_cb.inst_in <= mem[count];
           count++;
         end
         else begin
           seq_item_port.get_next_item(req);
-          msp430_vif.driver_if_mp.driver_cb.inst_in <= req.instrn ;
+          msp430_vif.driver_if_mp.driver_cb.inst_in <= req.instrn;
           Drv2Sb_port.write(req);
           seq_item_port.item_done();
           count = 0;
