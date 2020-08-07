@@ -44,7 +44,7 @@ class msp430_agent extends uvm_agent;
     
   msp430_driver driver;
   uvm_sequencer#(msp430_transaction) sequencer;
-    
+
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction

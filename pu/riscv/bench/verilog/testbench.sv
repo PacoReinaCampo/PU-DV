@@ -101,8 +101,8 @@ module test;
     .PARCEL_SIZE           ( PARCEL_SIZE           )
   )
   dut (
-    .rstn                 ( riscv_if.HRESETn              ),
-    .clk                  ( riscv_if.HCLK                 ),
+    .rstn                 ( riscv_if.rstn                 ),
+    .clk                  ( riscv_if.clk                  ),
 
     .if_stall_nxt_pc      ( riscv_if.if_stall_nxt_pc      ),
     .if_nxt_pc            ( riscv_if.if_nxt_pc            ),
@@ -144,10 +144,10 @@ module test;
   ); 
 
   //Clock generation
-  always #5 riscv_if.dbg_clk = ~riscv_if.dbg_clk;
+  always #5 riscv_if.clk = ~riscv_if.clk;
   
   initial begin
-    riscv_if.dbg_clk = 0;
+    riscv_if.clk = 0;
   end
 
   initial begin

@@ -43,19 +43,19 @@ class msp430_env extends uvm_env;
   `uvm_component_utils(msp430_env)
 
   msp430_agent agent;
-  msp430_monitor mon;
-  msp430_scoreboard sb;
-  msp430_subscriber sub;
+  msp430_monitor monitor;
+  msp430_scoreboard scoreboard;
+  msp430_subscriber subscriber;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
 
   function void build_phase(uvm_phase phase);
-    agent = msp430_agent::type_id::create("agent", this);
-    mon   = msp430_monitor::type_id::create("mon", this);
-    sb    = msp430_scoreboard::type_id::create("sb", this);
-    sub   = msp430_subscriber::type_id::create("sub", this);
+    agent      = msp430_agent::type_id::create("agent", this);
+    monitor    = msp430_monitor::type_id::create("monitor", this);
+    scoreboard = msp430_scoreboard::type_id::create("scoreboard", this);
+    subscriber = msp430_subscriber::type_id::create("subscriber", this);
   endfunction
 
   // connect ports of various TB components here

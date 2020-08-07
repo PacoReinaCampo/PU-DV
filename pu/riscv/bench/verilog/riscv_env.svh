@@ -43,19 +43,19 @@ class riscv_env extends uvm_env;
   `uvm_component_utils(riscv_env)
 
   riscv_agent agent;
-  riscv_monitor mon;
-  riscv_scoreboard sb;
-  riscv_subscriber sub;
+  riscv_monitor monitor;
+  riscv_scoreboard scoreboard;
+  riscv_subscriber subscriber;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
 
   function void build_phase(uvm_phase phase);
-    agent = riscv_agent::type_id::create("agent", this);
-    mon   = riscv_monitor::type_id::create("mon", this);
-    sb    = riscv_scoreboard::type_id::create("sb", this);
-    sub   = riscv_subscriber::type_id::create("sub", this);
+    agent      = riscv_agent::type_id::create("agent", this);
+    monitor    = riscv_monitor::type_id::create("monitor", this);
+    scoreboard = riscv_scoreboard::type_id::create("scoreboard", this);
+    subscriber = riscv_subscriber::type_id::create("subscriber", this);
   endfunction
 
   // connect ports of various TB components here

@@ -239,54 +239,54 @@ interface riscv_interface #(
   endclocking : slave_cb
   
   clocking monitor_cb @(posedge clk);
-    input                      rstn;  // Reset
-    input                      clk;   // Clock
+    input rstn;  // Reset
+    input clk;   // Clock
 
     // Instruction Memory Access bus
-    input                      if_stall_nxt_pc;
-    input [XLEN          -1:0] if_nxt_pc;
-    input                      if_stall;
-    input                      if_flush;
-    input [PARCEL_SIZE   -1:0] if_parcel;
-    input [XLEN          -1:0] if_parcel_pc;
-    input [PARCEL_SIZE/16-1:0] if_parcel_valid;
-    input                      if_parcel_misaligned;
-    input                      if_parcel_page_fault;
+    input if_stall_nxt_pc;
+    input if_nxt_pc;
+    input if_stall;
+    input if_flush;
+    input if_parcel;
+    input if_parcel_pc;
+    input if_parcel_valid;
+    input if_parcel_misaligned;
+    input if_parcel_page_fault;
 
     // Data Memory Access bus
-    input [XLEN         -1:0] dmem_adr;
-    input [XLEN         -1:0] dmem_d;
-    input [XLEN         -1:0] dmem_q;
-    input                     dmem_we;
-    input [              2:0] dmem_size;
-    input                     dmem_req;
-    input                     dmem_ack;
-    input                     dmem_err;
-    input                     dmem_misaligned;
-    input                     dmem_page_fault;
+    input dmem_adr;
+    input dmem_d;
+    input dmem_q;
+    input dmem_we;
+    input dmem_size;
+    input dmem_req;
+    input dmem_ack;
+    input dmem_err;
+    input dmem_misaligned;
+    input dmem_page_fault;
 
     // cpu state
-    input              [     1:0] st_prv;
-    input [PMP_CNT-1:0][     7:0] st_pmpcfg;
-    input [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr;
+    input st_prv;
+    input st_pmpcfg;
+    input st_pmpaddr;
 
-    input                     bu_cacheflush;
+    input bu_cacheflush;
 
     // Interrupts
-    input                     ext_nmi;
-    input                     ext_tint;
-    input                     ext_sint;
-    input [              3:0] ext_int;
+    input ext_nmi;
+    input ext_tint;
+    input ext_sint;
+    input ext_int;
 
     // Debug Interface
-    input                     dbg_stall;
-    input                     dbg_strb;
-    input                     dbg_we;
-    input [PLEN         -1:0] dbg_addr;
-    input [XLEN         -1:0] dbg_dati;
-    input [XLEN         -1:0] dbg_dato;
-    input                     dbg_ack;
-    input                     dbg_bp;
+    input dbg_stall;
+    input dbg_strb;
+    input dbg_we;
+    input dbg_addr;
+    input dbg_dati;
+    input dbg_dato;
+    input dbg_ack;
+    input dbg_bp;
   endclocking : monitor_cb
 
   modport master(clocking master_cb);

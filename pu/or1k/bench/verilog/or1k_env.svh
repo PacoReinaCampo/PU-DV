@@ -43,19 +43,19 @@ class or1k_env extends uvm_env;
   `uvm_component_utils(or1k_env)
 
   or1k_agent agent;
-  or1k_monitor mon;
-  or1k_scoreboard sb;
-  or1k_subscriber sub;
+  or1k_monitor monitor;
+  or1k_scoreboard scoreboard;
+  or1k_subscriber subscriber;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
 
   function void build_phase(uvm_phase phase);
-    agent = or1k_agent::type_id::create("agent", this);
-    mon   = or1k_monitor::type_id::create("mon", this);
-    sb    = or1k_scoreboard::type_id::create("sb", this);
-    sub   = or1k_subscriber::type_id::create("sub", this);
+    agent      = or1k_agent::type_id::create("agent", this);
+    monitor    = or1k_monitor::type_id::create("monitor", this);
+    scoreboard = or1k_scoreboard::type_id::create("scoreboard", this);
+    subscriber = or1k_subscriber::type_id::create("subscriber", this);
   endfunction
 
   // connect ports of various TB components here
