@@ -42,6 +42,7 @@
 class msp430_monitor extends uvm_monitor;
   // register the monitor in the UVM factory
   `uvm_component_utils(msp430_monitor)
+
   int count;
 
   // Declare virtual interface

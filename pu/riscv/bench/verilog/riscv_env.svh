@@ -63,12 +63,12 @@ class riscv_env extends uvm_env;
     `uvm_info("", "Called env::connect_phase", UVM_NONE);
 
     // connect driver's analysis port to scoreboard's analysis implementation port
-    agent.driver.Drv2Sb_port.connect(sb.Drv2Sb_port);
+    agent.driver.driver2scoreboard_port.connect(sb.driver2scoreboard_port);
 
     // connect monitor's analysis port to scoreboard's analysis implementation port
-    mon.Mon2Sb_port.connect(sb.Mon2Sb_port);
+    monitor.monitor2scoreboard_port.connect(sb.monitor2scoreboard_port);
 
     // connect monitor's analysis port to subscriber's analysis implementation port
-    mon.aport.connect(sub.aport);
+    monitor.aport.connect(sub.aport);
   endfunction: connect_phase
 endclass
