@@ -94,7 +94,7 @@ class msp430_subscriber extends uvm_subscriber #(msp430_transaction);
 
   // Write function for the analysis port
   function void write(msp430_transaction t);
-    instruction = t.inst_out;
+    instruction = t.pmem_dout;
     cover_processor.sample();
   endfunction
 endclass
