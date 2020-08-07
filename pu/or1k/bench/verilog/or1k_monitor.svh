@@ -48,7 +48,7 @@ class or1k_monitor extends uvm_monitor;
   virtual or1k_interface or1k_vif;
 
   // Analysis port to broadcast results to scoreboard 
-  uvm_analysis_port #(or1k_transaction) Mon2Sb_port;
+  uvm_analysis_port #(or1k_transaction) monitor2scoreboard_port;
 
   // Analysis port to broadcast results to subscriber 
   uvm_analysis_port #(or1k_transaction) aport;
@@ -63,13 +63,13 @@ class or1k_monitor extends uvm_monitor;
       `uvm_error("", "uvm_config_db::get failed")
     end
 
-    Mon2Sb_port = new("Mon2Sb",this);
+    monitor2scoreboard_port = new("monitor2scoreboard",this);
     aport = new("aport",this);
   endfunction
 
   task run_phase(uvm_phase phase);
-    or1k_transaction pros_trans;
-    pros_trans = new ("trans");
+    or1k_transaction pu_transaction;
+    pu_transaction = new ("transaction");
     count = 0;
     fork
       forever begin
@@ -78,21 +78,84 @@ class or1k_monitor extends uvm_monitor;
             count++;
           end
           else begin
-            // Set transaction from interface data
-            pros_trans.pc       = or1k_vif.monitor_if_mp.monitor_cb.pc;
-            pros_trans.inst_out = or1k_vif.monitor_if_mp.monitor_cb.inst_out;
-            pros_trans.reg_data = or1k_vif.monitor_if_mp.monitor_cb.reg_data;
-            pros_trans.reg_en   = or1k_vif.monitor_if_mp.monitor_cb.reg_en;
-            pros_trans.reg_add  = or1k_vif.monitor_if_mp.monitor_cb.reg_add;
-            pros_trans.mem_data = or1k_vif.monitor_if_mp.monitor_cb.mem_data;
-            pros_trans.mem_en   = or1k_vif.monitor_if_mp.monitor_cb.mem_en;
-            pros_trans.mem_add  = or1k_vif.monitor_if_mp.monitor_cb.mem_add;
+            // Instruction bus
+            pu_transaction.ibus_err_i   = or1k_vif.monitor_if_mp.monitor_cb.ibus_err_i;
+            pu_transaction.ibus_ack_i   = or1k_vif.monitor_if_mp.monitor_cb.ibus_ack_i;
+            pu_transaction.ibus_dat_i   = or1k_vif.monitor_if_mp.monitor_cb.ibus_dat_i;
+            pu_transaction.ibus_adr_o   = or1k_vif.monitor_if_mp.monitor_cb.ibus_adr_o;
+            pu_transaction.ibus_req_o   = or1k_vif.monitor_if_mp.monitor_cb.ibus_req_o;
+            pu_transaction.ibus_burst_o = or1k_vif.monitor_if_mp.monitor_cb.ibus_burst_o;
+
+            // Data bus
+            pu_transaction.dbus_err_i   = or1k_vif.monitor_if_mp.monitor_cb.dbus_err_i;
+            pu_transaction.dbus_ack_i   = or1k_vif.monitor_if_mp.monitor_cb.dbus_ack_i;
+            pu_transaction.dbus_dat_i   = or1k_vif.monitor_if_mp.monitor_cb.dbus_dat_i;
+            pu_transaction.dbus_adr_o   = or1k_vif.monitor_if_mp.monitor_cb.dbus_adr_o;
+            pu_transaction.dbus_dat_o   = or1k_vif.monitor_if_mp.monitor_cb.dbus_dat_o;
+            pu_transaction.dbus_req_o   = or1k_vif.monitor_if_mp.monitor_cb.dbus_req_o;
+            pu_transaction.dbus_bsel_o  = or1k_vif.monitor_if_mp.monitor_cb.dbus_bsel_o;
+            pu_transaction.dbus_we_o    = or1k_vif.monitor_if_mp.monitor_cb.dbus_we_o;
+            pu_transaction.dbus_burst_o = or1k_vif.monitor_if_mp.monitor_cb.dbus_burst_o;
+
+            // Interrupts
+            pu_transaction.irq_i = or1k_vif.monitor_if_mp.monitor_cb.irq_i;
+
+            // Debug interface
+            pu_transaction.du_addr_i = or1k_vif.monitor_if_mp.monitor_cb.du_addr_i;
+            pu_transaction.du_stb_i  = or1k_vif.monitor_if_mp.monitor_cb.du_stb_i;
+            pu_transaction.du_dat_i  = or1k_vif.monitor_if_mp.monitor_cb.du_dat_i;
+            pu_transaction.du_we_i   = or1k_vif.monitor_if_mp.monitor_cb.du_we_i;
+            pu_transaction.du_dat_o  = or1k_vif.monitor_if_mp.monitor_cb.du_dat_o;
+            pu_transaction.du_ack_o  = or1k_vif.monitor_if_mp.monitor_cb.du_ack_o;
+
+            // Stall control from debug interface
+            pu_transaction.du_stall_i = or1k_vif.monitor_if_mp.monitor_cb.du_stall_i;
+            pu_transaction.du_stall_o = or1k_vif.monitor_if_mp.monitor_cb.du_stall_o;
+
+            pu_transaction.traceport_exec_valid_o    = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_valid_o;
+            pu_transaction.traceport_exec_pc_o       = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_pc_o;
+            pu_transaction.traceport_exec_jb_o       = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jb_o;
+            pu_transaction.traceport_exec_jal_o      = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jal_o;
+            pu_transaction.traceport_exec_jr_o       = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jr_o;
+            pu_transaction.traceport_exec_jbtarget_o = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jbtarget_o;
+            pu_transaction.traceport_exec_insn_o     = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_insn_o;
+            pu_transaction.traceport_exec_wbdata_o   = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_wbdata_o;
+            pu_transaction.traceport_exec_wbreg_o    = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_wbreg_o;
+            pu_transaction.traceport_exec_wben_o     = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_wben_o;
+
+            // SPR accesses to external units (cache; mmu; etc.)
+            pu_transaction.spr_bus_addr_o     = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_addr_o;
+            pu_transaction.spr_bus_we_o       = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_we_o;
+            pu_transaction.spr_bus_stb_o      = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_stb_o;
+            pu_transaction.spr_bus_dat_o      = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_o;
+            pu_transaction.spr_bus_dat_dmmu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_dmmu_i;
+            pu_transaction.spr_bus_ack_dmmu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_dmmu_i;
+            pu_transaction.spr_bus_dat_immu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_immu_i;
+            pu_transaction.spr_bus_ack_immu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_immu_i;
+            pu_transaction.spr_bus_dat_mac_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_mac_i;
+            pu_transaction.spr_bus_ack_mac_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_mac_i;
+            pu_transaction.spr_bus_dat_pmu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_pmu_i;
+            pu_transaction.spr_bus_ack_pmu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_pmu_i;
+            pu_transaction.spr_bus_dat_pcu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_pcu_i;
+            pu_transaction.spr_bus_ack_pcu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_pcu_i;
+            pu_transaction.spr_bus_dat_fpu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_fpu_i;
+            pu_transaction.spr_bus_ack_fpu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_fpu_i;
+            pu_transaction.spr_sr_o           = or1k_vif.monitor_if_mp.monitor_cb.spr_sr_o;
+
+            // The multicore core identifier
+            pu_transaction.multicore_coreid_i = or1k_vif.monitor_if_mp.monitor_cb.multicore_coreid_i;
+
+            // The number of cores
+            pu_transaction.multicore_numcores_i = or1k_vif.monitor_if_mp.monitor_cb.multicore_numcores_i;
+
+            pu_transaction.snoop_adr_i = or1k_vif.monitor_if_mp.monitor_cb.snoop_adr_i;
+            pu_transaction.snoop_en_i  = or1k_vif.monitor_if_mp.monitor_cb.snoop_en_i;
 
             // Send transaction to Scoreboard
-            Mon2Sb_port.write(pros_trans);
+            monitor2scoreboard_port.write(pu_transaction);
 
             // Send transaction to subscriber
-            aport.write(pros_trans);
+            aport.write(pu_transaction);
             count = 0;
           end
         end

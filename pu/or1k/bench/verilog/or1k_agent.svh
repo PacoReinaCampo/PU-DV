@@ -41,19 +41,19 @@
 
 class or1k_agent extends uvm_agent;
   `uvm_component_utils(or1k_agent)
-    
+
   or1k_driver driver;
   uvm_sequencer#(or1k_transaction) sequencer;
-    
+
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
-    
+
   function void build_phase(uvm_phase phase);
     driver    = or1k_driver::type_id::create("driver", this);
     sequencer = uvm_sequencer#(or1k_transaction)::type_id::create("sequencer", this);
   endfunction
-    
+
   // In UVM connect phase, we connect the sequencer to the driver.
   function void connect_phase(uvm_phase phase);
     driver.seq_item_port.connect(sequencer.seq_item_export);

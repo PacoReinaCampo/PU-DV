@@ -46,7 +46,7 @@ class msp430_driver extends uvm_driver #(msp430_transaction);
   virtual msp430_interface msp430_vif;
 
   // Analysis port to broadcast input values to scoreboard
-  uvm_analysis_port #(msp430_transaction) Drv2Sb_port;
+  uvm_analysis_port #(msp430_transaction) driver2scoreboard_port;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -62,7 +62,7 @@ class msp430_driver extends uvm_driver #(msp430_transaction);
 
     drv_clk = 1'b0;
 
-    Drv2Sb_port = new("Drv2Sb",this);
+    driver2scoreboard_port = new("driver2scoreboard",this);
   endfunction 
 
   task run_phase(uvm_phase phase);
@@ -101,7 +101,7 @@ class msp430_driver extends uvm_driver #(msp430_transaction);
         else begin
           seq_item_port.get_next_item(req);
           msp430_vif.driver_if_mp.driver_cb.inst_in <= req.instrn;
-          Drv2Sb_port.write(req);
+          driver2scoreboard_port.write(req);
           seq_item_port.item_done();
           count = 0;
         end

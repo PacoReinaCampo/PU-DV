@@ -48,7 +48,7 @@ class riscv_monitor extends uvm_monitor;
   virtual riscv_interface riscv_vif;
 
   // Analysis port to broadcast results to scoreboard 
-  uvm_analysis_port #(riscv_transaction) Mon2Sb_port;
+  uvm_analysis_port #(riscv_transaction) monitor2scoreboard_port;
 
   // Analysis port to broadcast results to subscriber 
   uvm_analysis_port #(riscv_transaction) aport;
@@ -63,13 +63,13 @@ class riscv_monitor extends uvm_monitor;
       `uvm_error("", "uvm_config_db::get failed")
     end
 
-    Mon2Sb_port = new("Mon2Sb",this);
+    monitor2scoreboard_port = new("monitor2scoreboard",this);
     aport = new("aport",this);
   endfunction
 
   task run_phase(uvm_phase phase);
-    riscv_transaction pros_trans;
-    pros_trans = new ("trans");
+    riscv_transaction pu_transaction;
+    pu_transaction = new ("transaction");
     count = 0;
     fork
       forever begin
@@ -78,21 +78,57 @@ class riscv_monitor extends uvm_monitor;
             count++;
           end
           else begin
-            // Set transaction from interface data
-            pros_trans.pc       = riscv_vif.monitor_if_mp.monitor_cb.pc;
-            pros_trans.inst_out = riscv_vif.monitor_if_mp.monitor_cb.inst_out;
-            pros_trans.reg_data = riscv_vif.monitor_if_mp.monitor_cb.reg_data;
-            pros_trans.reg_en   = riscv_vif.monitor_if_mp.monitor_cb.reg_en;
-            pros_trans.reg_add  = riscv_vif.monitor_if_mp.monitor_cb.reg_add;
-            pros_trans.mem_data = riscv_vif.monitor_if_mp.monitor_cb.mem_data;
-            pros_trans.mem_en   = riscv_vif.monitor_if_mp.monitor_cb.mem_en;
-            pros_trans.mem_add  = riscv_vif.monitor_if_mp.monitor_cb.mem_add;
+            // Instruction Memory Access bus
+            pu_transaction.if_stall_nxt_pc      = or1k_vif.monitor_if_mp.monitor_cb.if_stall_nxt_pc;
+            pu_transaction.if_nxt_pc            = or1k_vif.monitor_if_mp.monitor_cb.if_nxt_pc;
+            pu_transaction.if_stall             = or1k_vif.monitor_if_mp.monitor_cb.if_stall;
+            pu_transaction.if_flush             = or1k_vif.monitor_if_mp.monitor_cb.if_flush;
+            pu_transaction.if_parcel            = or1k_vif.monitor_if_mp.monitor_cb.if_parcel;
+            pu_transaction.if_parcel_pc         = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_pc;
+            pu_transaction.if_parcel_valid      = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_valid;
+            pu_transaction.if_parcel_misaligned = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_misaligned;
+            pu_transaction.if_parcel_page_fault = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_page_fault;
+
+            // Data Memory Access bus
+            pu_transaction.dmem_adr        = or1k_vif.monitor_if_mp.monitor_cb.dmem_adr;
+            pu_transaction.dmem_d          = or1k_vif.monitor_if_mp.monitor_cb.dmem_d;
+            pu_transaction.dmem_q          = or1k_vif.monitor_if_mp.monitor_cb.dmem_q;
+            pu_transaction.dmem_we         = or1k_vif.monitor_if_mp.monitor_cb.dmem_we;
+            pu_transaction.dmem_size       = or1k_vif.monitor_if_mp.monitor_cb.dmem_size;
+            pu_transaction.dmem_req        = or1k_vif.monitor_if_mp.monitor_cb.dmem_req;
+            pu_transaction.dmem_ack        = or1k_vif.monitor_if_mp.monitor_cb.dmem_ack;
+            pu_transaction.dmem_err        = or1k_vif.monitor_if_mp.monitor_cb.dmem_err;
+            pu_transaction.dmem_misaligned = or1k_vif.monitor_if_mp.monitor_cb.dmem_misaligned;
+            pu_transaction.dmem_page_fault = or1k_vif.monitor_if_mp.monitor_cb.dmem_page_fault;
+
+            // cpu state
+            pu_transaction.st_prv     = or1k_vif.monitor_if_mp.monitor_cb.st_prv;
+            pu_transaction.st_pmpcfg  = or1k_vif.monitor_if_mp.monitor_cb.st_pmpcfg;
+            pu_transaction.st_pmpaddr = or1k_vif.monitor_if_mp.monitor_cb.st_pmpaddr;
+
+            pu_transaction.bu_cacheflush = or1k_vif.monitor_if_mp.monitor_cb.bu_cacheflush;
+
+            // Interrupts
+            pu_transaction.ext_nmi  = or1k_vif.monitor_if_mp.monitor_cb.ext_nmi;
+            pu_transaction.ext_tint = or1k_vif.monitor_if_mp.monitor_cb.ext_tint;
+            pu_transaction.ext_sint = or1k_vif.monitor_if_mp.monitor_cb.ext_sint;
+            pu_transaction.ext_int  = or1k_vif.monitor_if_mp.monitor_cb.ext_int;
+
+            // Debug Interface
+            pu_transaction.dbg_stall = or1k_vif.monitor_if_mp.monitor_cb.dbg_stall;
+            pu_transaction.dbg_strb  = or1k_vif.monitor_if_mp.monitor_cb.dbg_strb;
+            pu_transaction.dbg_we    = or1k_vif.monitor_if_mp.monitor_cb.dbg_we;
+            pu_transaction.dbg_addr  = or1k_vif.monitor_if_mp.monitor_cb.dbg_addr;
+            pu_transaction.dbg_dati  = or1k_vif.monitor_if_mp.monitor_cb.dbg_dati;
+            pu_transaction.dbg_dato  = or1k_vif.monitor_if_mp.monitor_cb.dbg_dato;
+            pu_transaction.dbg_ack   = or1k_vif.monitor_if_mp.monitor_cb.dbg_ack;
+            pu_transaction.dbg_bp    = or1k_vif.monitor_if_mp.monitor_cb.dbg_bp;
 
             // Send transaction to Scoreboard
-            Mon2Sb_port.write(pros_trans);
+            monitor2scoreboard_port.write(pu_transaction);
 
             // Send transaction to subscriber
-            aport.write(pros_trans);
+            aport.write(pu_transaction);
             count = 0;
           end
         end
