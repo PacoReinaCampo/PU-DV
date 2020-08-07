@@ -49,12 +49,12 @@ class msp430_scoreboard extends uvm_scoreboard;
   //msp430_transaction trans, input_trans;
 
   // analysis implementation ports
-  uvm_analysis_imp_mon_trans #(msp430_transaction,msp430_scoreboard) Mon2Sb_port;
-  uvm_analysis_imp_drv_trans #(msp430_transaction,msp430_scoreboard) Drv2Sb_port;
+  uvm_analysis_imp_mon_trans #(msp430_transaction,msp430_scoreboard) monitor2scoreboard_port;
+  uvm_analysis_imp_drv_trans #(msp430_transaction,msp430_scoreboard) driver2scoreboard_port;
 
   // TLM FIFOs to store the actual and expected transaction values
-  uvm_tlm_fifo #(msp430_transaction)  drv_fifo;
-  uvm_tlm_fifo #(msp430_transaction)  mon_fifo;
+  uvm_tlm_fifo #(msp430_transaction)  driver_fifo;
+  uvm_tlm_fifo #(msp430_transaction)  monitor_fifo;
 
   function new (string name, uvm_component parent);
     super.new(name, parent);
@@ -63,20 +63,20 @@ class msp430_scoreboard extends uvm_scoreboard;
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     //Instantiate the analysis ports and Fifo
-    Mon2Sb_port = new("Mon2Sb",  this);
-    Drv2Sb_port = new("Drv2Sb",  this);
-    drv_fifo    = new("drv_fifo", this, 8);
-    mon_fifo    = new("mon_fifo", this, 8);
+    monitor2scoreboard_port = new("monitor2scoreboard",  this);
+    driver2scoreboard_port  = new("driver2scoreboard",  this);
+    driver_fifo             = new("driver_fifo", this, 8);
+    monitor_fifo            = new("monitor_fifo", this, 8);
   endfunction : build_phase
 
   // write_drv_trans will be called when the driver broadcasts a transaction to the scoreboard
   function void write_drv_trans (msp430_transaction input_trans);
-    void'(drv_fifo.try_put(input_trans));
+    void'(driver_fifo.try_put(input_trans));
   endfunction : write_drv_trans
 
   // write_mon_trans will be called when the monitor broadcasts the DUT results to the scoreboard 
   function void write_mon_trans (msp430_transaction trans);
-    void'(mon_fifo.try_put(trans));
+    void'(monitor_fifo.try_put(trans));
   endfunction : write_mon_trans
 
   task run_phase(uvm_phase phase);
@@ -87,8 +87,8 @@ class msp430_scoreboard extends uvm_scoreboard;
     bit store,jmp,eop,nop,inter1,multiply,shift;
     int s1,s2;
     forever begin
-      drv_fifo.get(exp_trans);
-      mon_fifo.get(out_trans);
+      driver_fifo.get(exp_trans);
+      monitor_fifo.get(out_trans);
       h1=0;
       dir=0;
       s1=0;
