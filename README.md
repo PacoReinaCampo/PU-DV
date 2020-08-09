@@ -548,7 +548,7 @@ sudo make install
 
 # 4. CONCLUSION
 
-## 4.1. FOR WINDOWS USERS!
+## 4.1. OPEN SOURCE TOOLS FOR WINDOWS USERS!
 
 1. Settings → Apps → Apps & features → Related settings, Programs and
 Features → Turn Windows features on or off → Windows Subsystem for
