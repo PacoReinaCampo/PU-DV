@@ -81,8 +81,8 @@ class or1k_transaction extends uvm_sequence_item;
   parameter OPTION_PIC_TRIGGER   = "LEVEL";
   parameter OPTION_PIC_NMI_WIDTH = 0;
 
-  parameter FEATURE_DSX        = "NONE";
-  parameter FEATURE_OVERFLOW   = "NONE";
+  parameter FEATURE_DSX        = "ENABLED";
+  parameter FEATURE_OVERFLOW   = "ENABLED";
   parameter FEATURE_CARRY_FLAG = "ENABLED";
 
   parameter FEATURE_FASTCONTEXTS     = "NONE";
@@ -93,26 +93,16 @@ class or1k_transaction extends uvm_sequence_item;
 
   parameter OPTION_RESET_PC = {{(OPTION_OPERAND_WIDTH-13){1'b0}}, `OR1K_RESET_VECTOR, 8'd0};
 
-  parameter OPTION_TCM_FETCHER = "DISABLED";
-
   parameter FEATURE_MULTIPLIER = "THREESTAGE";
-  parameter FEATURE_DIVIDER    = "NONE";
+  parameter FEATURE_DIVIDER    = "SERIAL";
 
-  parameter OPTION_SHIFTER = "BARREL";
-
-  parameter FEATURE_ADDC   = "NONE";
+  parameter FEATURE_ADDC   = "ENABLED";
   parameter FEATURE_SRA    = "ENABLED";
   parameter FEATURE_ROR    = "NONE";
   parameter FEATURE_EXT    = "NONE";
-  parameter FEATURE_CMOV   = "NONE";
-  parameter FEATURE_FFL1   = "NONE";
-  parameter FEATURE_MSYNC  = "ENABLED";
-  parameter FEATURE_PSYNC  = "NONE";
-  parameter FEATURE_CSYNC  = "NONE";
+  parameter FEATURE_CMOV   = "ENABLED";
+  parameter FEATURE_FFL1   = "ENABLED";
   parameter FEATURE_ATOMIC = "ENABLED";
-
-  parameter FEATURE_FPU          = "NONE"; // ENABLED|NONE
-  parameter OPTION_FTOI_ROUNDING = "CPP"; // "CPP" / "IEEE"
 
   parameter FEATURE_CUST1 = "NONE";
   parameter FEATURE_CUST2 = "NONE";
@@ -123,6 +113,11 @@ class or1k_transaction extends uvm_sequence_item;
   parameter FEATURE_CUST7 = "NONE";
   parameter FEATURE_CUST8 = "NONE";
 
+  parameter FEATURE_FPU          = "NONE";
+  parameter OPTION_FTOI_ROUNDING = "CPP";
+
+  parameter OPTION_SHIFTER = "BARREL";
+
   parameter FEATURE_STORE_BUFFER            = "ENABLED";
   parameter OPTION_STORE_BUFFER_DEPTH_WIDTH = 8;
 
@@ -131,29 +126,45 @@ class or1k_transaction extends uvm_sequence_item;
   parameter FEATURE_TRACEPORT_EXEC   = "NONE";
   parameter FEATURE_BRANCH_PREDICTOR = "SIMPLE";
 
+  parameter BUS_IF_TYPE = "WISHBONE32";
+
+  parameter IBUS_WB_TYPE = "B3_READ_BURSTING";
+  parameter DBUS_WB_TYPE = "CLASSIC";
+
   rand bit [15:0] instrn;
 
-  // Instruction bus
-  bit                            ibus_err_i;
-  bit                            ibus_ack_i;
-  bit [`OR1K_INSN_WIDTH    -1:0] ibus_dat_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] ibus_adr_o;
-  bit                            ibus_req_o;
-  bit                            ibus_burst_o;
+  bit                            clk;
+  bit                            rst;
 
-  // Data bus
-  bit                            dbus_err_i;
-  bit                            dbus_ack_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] dbus_dat_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] dbus_adr_o;
-  bit [OPTION_OPERAND_WIDTH-1:0] dbus_dat_o;
-  bit                            dbus_req_o;
-  bit [                     3:0] dbus_bsel_o;
-  bit                            dbus_we_o;
-  bit                            dbus_burst_o;
+  // Wishbone Instruction
+  bit [                    31:0] iwbm_adr_o;
+  bit                            iwbm_stb_o;
+  bit                            iwbm_cyc_o;
+  bit [                     3:0] iwbm_sel_o;
+  bit                            iwbm_we_o;
+  bit [                     2:0] iwbm_cti_o;
+  bit [                     1:0] iwbm_bte_o;
+  bit [                    31:0] iwbm_dat_o;
+  bit                            iwbm_err_i;
+  bit                            iwbm_ack_i;
+  bit [                    31:0] iwbm_dat_i;
+  bit                            iwbm_rty_i;
 
-  // Interrupts
-  bit [                     31:0] irq_i;
+  // Wishbone Data
+  bit [                    31:0] dwbm_adr_o;
+  bit                            dwbm_stb_o;
+  bit                            dwbm_cyc_o;
+  bit [                     3:0] dwbm_sel_o;
+  bit                            dwbm_we_o;
+  bit [                     2:0] dwbm_cti_o;
+  bit [                     1:0] dwbm_bte_o;
+  bit [                    31:0] dwbm_dat_o;
+  bit                            dwbm_err_i;
+  bit                            dwbm_ack_i;
+  bit [                    31:0] dwbm_dat_i;
+  bit                            dwbm_rty_i;
+
+  bit [                    31:0] irq_i;
 
   // Debug interface
   bit [                    15:0] du_addr_i;
@@ -177,25 +188,6 @@ class or1k_transaction extends uvm_sequence_item;
   bit [OPTION_OPERAND_WIDTH-1:0] traceport_exec_wbdata_o;
   bit [OPTION_RF_ADDR_WIDTH-1:0] traceport_exec_wbreg_o;
   bit                            traceport_exec_wben_o;
-
-  // SPR accesses to external units (cache; mmu; etc.)
-  bit [                    15:0] spr_bus_addr_o;
-  bit                            spr_bus_we_o;
-  bit                            spr_bus_stb_o;
-  bit [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_o;
-  bit [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_dmmu_i;
-  bit                            spr_bus_ack_dmmu_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_immu_i;
-  bit                            spr_bus_ack_immu_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_mac_i;
-  bit                            spr_bus_ack_mac_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_pmu_i;
-  bit                            spr_bus_ack_pmu_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_pcu_i;
-  bit                            spr_bus_ack_pcu_i;
-  bit [OPTION_OPERAND_WIDTH-1:0] spr_bus_dat_fpu_i;
-  bit                            spr_bus_ack_fpu_i;
-  bit [                    15:0] spr_sr_o;
 
   // The multicore core identifier
   bit [OPTION_OPERAND_WIDTH-1:0] multicore_coreid_i;

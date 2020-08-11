@@ -79,78 +79,67 @@ class or1k_monitor extends uvm_monitor;
             count++;
           end
           else begin
-            // Instruction bus
-            pu_transaction.ibus_err_i   = or1k_vif.monitor_if_mp.monitor_cb.ibus_err_i;
-            pu_transaction.ibus_ack_i   = or1k_vif.monitor_if_mp.monitor_cb.ibus_ack_i;
-            pu_transaction.ibus_dat_i   = or1k_vif.monitor_if_mp.monitor_cb.ibus_dat_i;
-            pu_transaction.ibus_adr_o   = or1k_vif.monitor_if_mp.monitor_cb.ibus_adr_o;
-            pu_transaction.ibus_req_o   = or1k_vif.monitor_if_mp.monitor_cb.ibus_req_o;
-            pu_transaction.ibus_burst_o = or1k_vif.monitor_if_mp.monitor_cb.ibus_burst_o;
+            // Wishbone Instruction
+            pu_transaction.iwbm_adr_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_adr_o;
+            pu_transaction.iwbm_stb_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_stb_o;
+            pu_transaction.iwbm_cyc_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_cyc_o;
+            pu_transaction.iwbm_sel_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_sel_o;
+            pu_transaction.iwbm_we_o    = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_we_o;
+            pu_transaction.iwbm_cti_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_cti_o;
+            pu_transaction.iwbm_bte_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_bte_o;
+            pu_transaction.iwbm_dat_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_dat_o;
+            pu_transaction.iwbm_err_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_err_i;
+            pu_transaction.iwbm_ack_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_ack_i;
+            pu_transaction.iwbm_dat_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_dat_i;
+            pu_transaction.iwbm_rty_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.iwbm_rty_i;
 
-            // Data bus
-            pu_transaction.dbus_err_i   = or1k_vif.monitor_if_mp.monitor_cb.dbus_err_i;
-            pu_transaction.dbus_ack_i   = or1k_vif.monitor_if_mp.monitor_cb.dbus_ack_i;
-            pu_transaction.dbus_dat_i   = or1k_vif.monitor_if_mp.monitor_cb.dbus_dat_i;
-            pu_transaction.dbus_adr_o   = or1k_vif.monitor_if_mp.monitor_cb.dbus_adr_o;
-            pu_transaction.dbus_dat_o   = or1k_vif.monitor_if_mp.monitor_cb.dbus_dat_o;
-            pu_transaction.dbus_req_o   = or1k_vif.monitor_if_mp.monitor_cb.dbus_req_o;
-            pu_transaction.dbus_bsel_o  = or1k_vif.monitor_if_mp.monitor_cb.dbus_bsel_o;
-            pu_transaction.dbus_we_o    = or1k_vif.monitor_if_mp.monitor_cb.dbus_we_o;
-            pu_transaction.dbus_burst_o = or1k_vif.monitor_if_mp.monitor_cb.dbus_burst_o;
+            // Wishbone Data
+            pu_transaction.dwbm_adr_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_adr_o;
+            pu_transaction.dwbm_stb_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_stb_o;
+            pu_transaction.dwbm_cyc_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_cyc_o;
+            pu_transaction.dwbm_sel_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_sel_o;
+            pu_transaction.dwbm_we_o    = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_we_o;
+            pu_transaction.dwbm_cti_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_cti_o;
+            pu_transaction.dwbm_bte_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_bte_o;
+            pu_transaction.dwbm_dat_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_dat_o;
+            pu_transaction.dwbm_err_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_err_i;
+            pu_transaction.dwbm_ack_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_ack_i;
+            pu_transaction.dwbm_dat_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_dat_i;
+            pu_transaction.dwbm_rty_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.dwbm_rty_i;
 
-            // Interrupts
-            pu_transaction.irq_i = or1k_vif.monitor_if_mp.monitor_cb.irq_i;
+            pu_transaction.irq_i        = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.irq;
 
             // Debug interface
-            pu_transaction.du_addr_i = or1k_vif.monitor_if_mp.monitor_cb.du_addr_i;
-            pu_transaction.du_stb_i  = or1k_vif.monitor_if_mp.monitor_cb.du_stb_i;
-            pu_transaction.du_dat_i  = or1k_vif.monitor_if_mp.monitor_cb.du_dat_i;
-            pu_transaction.du_we_i   = or1k_vif.monitor_if_mp.monitor_cb.du_we_i;
-            pu_transaction.du_dat_o  = or1k_vif.monitor_if_mp.monitor_cb.du_dat_o;
-            pu_transaction.du_ack_o  = or1k_vif.monitor_if_mp.monitor_cb.du_ack_o;
+            pu_transaction.du_addr_i    = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_adr_i;
+            pu_transaction.du_stb_i     = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_stb_i;
+            pu_transaction.du_dat_i     = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_dat_i;
+            pu_transaction.du_we_i      = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_we_i;
+            pu_transaction.du_dat_o     = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_dat_o;
+            pu_transaction.du_ack_o     = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_ack_o;
 
             // Stall control from debug interface
-            pu_transaction.du_stall_i = or1k_vif.monitor_if_mp.monitor_cb.du_stall_i;
-            pu_transaction.du_stall_o = or1k_vif.monitor_if_mp.monitor_cb.du_stall_o;
+            pu_transaction.du_stall_i   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_stall_i;
+            pu_transaction.du_stall_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.du_stall_o;
 
-            pu_transaction.traceport_exec_valid_o    = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_valid_o;
-            pu_transaction.traceport_exec_pc_o       = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_pc_o;
-            pu_transaction.traceport_exec_jb_o       = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jb_o;
-            pu_transaction.traceport_exec_jal_o      = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jal_o;
-            pu_transaction.traceport_exec_jr_o       = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jr_o;
-            pu_transaction.traceport_exec_jbtarget_o = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_jbtarget_o;
-            pu_transaction.traceport_exec_insn_o     = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_insn_o;
-            pu_transaction.traceport_exec_wbdata_o   = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_wbdata_o;
-            pu_transaction.traceport_exec_wbreg_o    = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_wbreg_o;
-            pu_transaction.traceport_exec_wben_o     = or1k_vif.monitor_if_mp.monitor_cb.traceport_exec_wben_o;
-
-            // SPR accesses to external units (cache; mmu; etc.)
-            pu_transaction.spr_bus_addr_o     = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_addr_o;
-            pu_transaction.spr_bus_we_o       = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_we_o;
-            pu_transaction.spr_bus_stb_o      = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_stb_o;
-            pu_transaction.spr_bus_dat_o      = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_o;
-            pu_transaction.spr_bus_dat_dmmu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_dmmu_i;
-            pu_transaction.spr_bus_ack_dmmu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_dmmu_i;
-            pu_transaction.spr_bus_dat_immu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_immu_i;
-            pu_transaction.spr_bus_ack_immu_i = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_immu_i;
-            pu_transaction.spr_bus_dat_mac_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_mac_i;
-            pu_transaction.spr_bus_ack_mac_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_mac_i;
-            pu_transaction.spr_bus_dat_pmu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_pmu_i;
-            pu_transaction.spr_bus_ack_pmu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_pmu_i;
-            pu_transaction.spr_bus_dat_pcu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_pcu_i;
-            pu_transaction.spr_bus_ack_pcu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_pcu_i;
-            pu_transaction.spr_bus_dat_fpu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_dat_fpu_i;
-            pu_transaction.spr_bus_ack_fpu_i  = or1k_vif.monitor_if_mp.monitor_cb.spr_bus_ack_fpu_i;
-            pu_transaction.spr_sr_o           = or1k_vif.monitor_if_mp.monitor_cb.spr_sr_o;
+            pu_transaction.traceport_exec_valid_o    = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_valid_o;
+            pu_transaction.traceport_exec_pc_o       = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_pc_o;
+            pu_transaction.traceport_exec_jb_o       = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_jb_o;
+            pu_transaction.traceport_exec_jal_o      = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_jal_o;
+            pu_transaction.traceport_exec_jr_o       = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_jr_o;
+            pu_transaction.traceport_exec_jbtarget_o = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_jbtarget_o;
+            pu_transaction.traceport_exec_insn_o     = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_insn_o;
+            pu_transaction.traceport_exec_wbdata_o   = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_wbdata_o;
+            pu_transaction.traceport_exec_wbreg_o    = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_wbreg_o;
+            pu_transaction.traceport_exec_wben_o     = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.traceport_exec_wben_o;
 
             // The multicore core identifier
-            pu_transaction.multicore_coreid_i = or1k_vif.monitor_if_mp.monitor_cb.multicore_coreid_i;
+            pu_transaction.multicore_coreid_i = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.multicore_coreid_i;
 
             // The number of cores
-            pu_transaction.multicore_numcores_i = or1k_vif.monitor_if_mp.monitor_cb.multicore_numcores_i;
+            pu_transaction.multicore_numcores_i = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.multicore_numcores_i;
 
-            pu_transaction.snoop_adr_i = or1k_vif.monitor_if_mp.monitor_cb.snoop_adr_i;
-            pu_transaction.snoop_en_i  = or1k_vif.monitor_if_mp.monitor_cb.snoop_en_i;
+            pu_transaction.snoop_adr_i = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.snoop_adr_i;
+            pu_transaction.snoop_en_i  = or1k_vif.monitor_if_mp.monitor_cb.or1k_if.snoop_en_i;
 
             // Send transaction to Scoreboard
             monitor2scoreboard_port.write(pu_transaction);

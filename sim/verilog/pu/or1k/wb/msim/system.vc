@@ -1,6 +1,8 @@
-../../../../../../pu/or1k/bench/verilog/testbench.sv
++incdir+../../../../../../pu-or1k/rtl/verilog/pkg
 
-../../../../../../pu/or1k/rtl/verilog/design.sv
+../../../../../../pu/or1k/wb/bench/verilog/testbench.sv
+
+../../../../../../pu/or1k/wb/rtl/verilog/design.sv
 
 ../../../../../../pu-or1k/rtl/verilog/core/control/or1k_cfgrs.sv
 ../../../../../../pu-or1k/rtl/verilog/core/control/or1k_ctrl_cappuccino.sv
@@ -37,6 +39,7 @@
 ../../../../../../pu-or1k/rtl/verilog/core/or1k_branch_predictor_saturation_counter.sv
 ../../../../../../pu-or1k/rtl/verilog/core/or1k_branch_predictor_simple.sv
 ../../../../../../pu-or1k/rtl/verilog/core/or1k_bus_if_wb32.sv
+../../../../../../pu-or1k/rtl/verilog/core/or1k_core.sv
 ../../../../../../pu-or1k/rtl/verilog/core/or1k_cpu_cappuccino.sv
 ../../../../../../pu-or1k/rtl/verilog/core/or1k_cpu.sv
 ../../../../../../pu-or1k/rtl/verilog/core/or1k_decode_execute_cappuccino.sv
