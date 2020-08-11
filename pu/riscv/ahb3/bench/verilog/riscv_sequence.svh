@@ -42,16 +42,102 @@
 class riscv_transaction extends uvm_sequence_item;
   `uvm_object_utils(riscv_transaction)
 
+  parameter            XLEN                  = 64;
+  parameter            PLEN                  = 64;
+  parameter            ILEN                  = 64;
+  parameter            EXCEPTION_SIZE        = 16;
+  parameter [XLEN-1:0] PC_INIT               = 'h200;
+  parameter            HAS_USER              = 1;
+  parameter            HAS_SUPER             = 1;
+  parameter            HAS_HYPER             = 1;
+  parameter            HAS_BPU               = 1;
+  parameter            HAS_FPU               = 1;
+  parameter            HAS_MMU               = 1;
+  parameter            HAS_RVA               = 1;
+  parameter            HAS_RVM               = 1;
+  parameter            HAS_RVC               = 1;
+  parameter            IS_RV32E              = 1;
+
+  parameter            MULT_LATENCY          = 1;
+
+  parameter            BREAKPOINTS           = 8;
+
+  parameter            PMA_CNT               = 4;
+  parameter            PMP_CNT               = 16;
+
+  parameter            BP_GLOBAL_BITS        = 2;
+  parameter            BP_LOCAL_BITS         = 10;
+  parameter            BP_LOCAL_BITS_LSB     = 2;
+
+  parameter            DU_ADDR_SIZE          = 12;
+  parameter            MAX_BREAKPOINTS       = 8;
+
+  parameter            TECHNOLOGY            = "GENERIC";
+
+  parameter            MNMIVEC_DEFAULT       = PC_INIT - 'h004;
+  parameter            MTVEC_DEFAULT         = PC_INIT - 'h040;
+  parameter            HTVEC_DEFAULT         = PC_INIT - 'h080;
+  parameter            STVEC_DEFAULT         = PC_INIT - 'h0C0;
+  parameter            UTVEC_DEFAULT         = PC_INIT - 'h100;
+
+  parameter            JEDEC_BANK            = 10;
+  parameter            JEDEC_MANUFACTURER_ID = 'h6e;
+
+  parameter            HARTID                = 0;
+
+  parameter            PARCEL_SIZE           = 64;
+
   rand bit [15:0] instrn;
 
-  bit [ 7:0] pc;
-  bit [15:0] inst_out;
-  bit [15:0] reg_data;
-  bit [ 1:0] reg_en;
-  bit [ 2:0] reg_add;
-  bit [15:0] mem_data;
-  bit        mem_en;
-  bit [ 2:0] mem_add;
+  bit                         clk;
+  bit                         rst;
+
+  bit [PMA_CNT-1:0][    13:0] pma_cfg_i;
+  bit [PMA_CNT-1:0][XLEN-1:0] pma_adr_i;
+
+  // AHB3 instruction
+  bit                         ins_HSEL;
+  bit              [PLEN-1:0] ins_HADDR;
+  bit              [XLEN-1:0] ins_HWDATA;
+  bit              [XLEN-1:0] ins_HRDATA;
+  bit                         ins_HWRITE;
+  bit              [     2:0] ins_HSIZE;
+  bit              [     2:0] ins_HBURST;
+  bit              [     3:0] ins_HPROT;
+  bit              [     1:0] ins_HTRANS;
+  bit                         ins_HMASTLOCK;
+  bit                         ins_HREADY;
+  bit                         ins_HRESP;
+
+  // AHB3 data
+  bit                         dat_HSEL;
+  bit              [PLEN-1:0] dat_HADDR;
+  bit              [XLEN-1:0] dat_HWDATA;
+  bit              [XLEN-1:0] dat_HRDATA;
+  bit                         dat_HWRITE;
+  bit              [     2:0] dat_HSIZE;
+  bit              [     2:0] dat_HBURST;
+  bit              [     3:0] dat_HPROT;
+  bit              [     1:0] dat_HTRANS;
+  bit                         dat_HMASTLOCK;
+  bit                         dat_HREADY;
+  bit                         dat_HRESP;
+
+  // Interrupts
+  bit                         ext_nmi;
+  bit                         ext_tint;
+  bit                         ext_sint;
+  bit              [     3:0] ext_int;
+
+  // Debug Interface
+  bit                         dbg_stall;
+  bit                         dbg_strb;
+  bit                         dbg_we;
+  bit              [PLEN-1:0] dbg_addr;
+  bit              [XLEN-1:0] dbg_dati;
+  bit              [XLEN-1:0] dbg_dato;
+  bit                         dbg_ack;
+  bit                         dbg_bp;
 
   constraint input_constraint {
     //Cosntraint to prevent EOF operation

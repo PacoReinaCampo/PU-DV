@@ -66,9 +66,19 @@ interface riscv_interface #(
   parameter            BP_GLOBAL_BITS        = 2,
   parameter            BP_LOCAL_BITS         = 10,
   parameter            BP_LOCAL_BITS_LSB     = 2,
-
-  parameter            DU_ADDR_SIZE          = 12,
-  parameter            MAX_BREAKPOINTS       = 8,
+ 
+  parameter            ICACHE_SIZE           = 64,
+  parameter            ICACHE_BLOCK_SIZE     = 64,
+  parameter            ICACHE_WAYS           = 2,
+  parameter            ICACHE_REPLACE_ALG    = 0,
+  parameter            ITCM_SIZE             = 0,
+ 
+  parameter            DCACHE_SIZE           = 64,
+  parameter            DCACHE_BLOCK_SIZE     = 64,
+  parameter            DCACHE_WAYS           = 2,
+  parameter            DCACHE_REPLACE_ALG    = 0,
+  parameter            DTCM_SIZE             = 0,
+  parameter            WRITEBUFFER_SIZE      = 4,
 
   parameter            TECHNOLOGY            = "GENERIC",
 
@@ -87,88 +97,90 @@ interface riscv_interface #(
 )
   ();
 
-  logic                      rstn;  // Reset
-  logic                      clk;   // Clock
+  logic                         clk;
+  logic                         rst;
 
-  // Instruction Memory Access bus
-  logic                      if_stall_nxt_pc;
-  logic [XLEN          -1:0] if_nxt_pc;
-  logic                      if_stall;
-  logic                      if_flush;
-  logic [PARCEL_SIZE   -1:0] if_parcel;
-  logic [XLEN          -1:0] if_parcel_pc;
-  logic [PARCEL_SIZE/16-1:0] if_parcel_valid;
-  logic                      if_parcel_misaligned;
-  logic                      if_parcel_page_fault;
+  logic [PMA_CNT-1:0][    13:0] pma_cfg_i;
+  logic [PMA_CNT-1:0][XLEN-1:0] pma_adr_i;
 
-  // Data Memory Access bus
-  logic [XLEN         -1:0] dmem_adr;
-  logic [XLEN         -1:0] dmem_d;
-  logic [XLEN         -1:0] dmem_q;
-  logic                     dmem_we;
-  logic [              2:0] dmem_size;
-  logic                     dmem_req;
-  logic                     dmem_ack;
-  logic                     dmem_err;
-  logic                     dmem_misaligned;
-  logic                     dmem_page_fault;
+  // AHB3 instruction
+  logic                         ins_HSEL;
+  logic              [PLEN-1:0] ins_HADDR;
+  logic              [XLEN-1:0] ins_HWDATA;
+  logic              [XLEN-1:0] ins_HRDATA;
+  logic                         ins_HWRITE;
+  logic              [     2:0] ins_HSIZE;
+  logic              [     2:0] ins_HBURST;
+  logic              [     3:0] ins_HPROT;
+  logic              [     1:0] ins_HTRANS;
+  logic                         ins_HMASTLOCK;
+  logic                         ins_HREADY;
+  logic                         ins_HRESP;
 
-  // cpu state
-  logic              [     1:0] st_prv;
-  logic [PMP_CNT-1:0][     7:0] st_pmpcfg;
-  logic [PMP_CNT-1:0][XLEN-1:0] st_pmpaddr;
-
-  logic                     bu_cacheflush;
+  // AHB3 data
+  logic                         dat_HSEL;
+  logic              [PLEN-1:0] dat_HADDR;
+  logic              [XLEN-1:0] dat_HWDATA;
+  logic              [XLEN-1:0] dat_HRDATA;
+  logic                         dat_HWRITE;
+  logic              [     2:0] dat_HSIZE;
+  logic              [     2:0] dat_HBURST;
+  logic              [     3:0] dat_HPROT;
+  logic              [     1:0] dat_HTRANS;
+  logic                         dat_HMASTLOCK;
+  logic                         dat_HREADY;
+  logic                         dat_HRESP;
 
   // Interrupts
-  logic                     ext_nmi;
-  logic                     ext_tint;
-  logic                     ext_sint;
-  logic [              3:0] ext_int;
+  logic                         ext_nmi;
+  logic                         ext_tint;
+  logic                         ext_sint;
+  logic              [     3:0] ext_int;
 
   // Debug Interface
-  logic                     dbg_stall;
-  logic                     dbg_strb;
-  logic                     dbg_we;
-  logic [PLEN         -1:0] dbg_addr;
-  logic [XLEN         -1:0] dbg_dati;
-  logic [XLEN         -1:0] dbg_dato;
-  logic                     dbg_ack;
-  logic                     dbg_bp;
+  logic                         dbg_stall;
+  logic                         dbg_strb;
+  logic                         dbg_we;
+  logic              [PLEN-1:0] dbg_addr;
+  logic              [XLEN-1:0] dbg_dati;
+  logic              [XLEN-1:0] dbg_dato;
+  logic                         dbg_ack;
+  logic                         dbg_bp;
   
   clocking master_cb @(posedge clk);
-    output rstn;  // Reset
-    output clk;   // Clock
+    output clk;
+    output rst;
 
-    // Instruction Memory Access bus
-    output if_stall_nxt_pc;
-    input  if_nxt_pc;
-    input  if_stall;
-    input  if_flush;
-    output if_parcel;
-    output if_parcel_pc;
-    output if_parcel_valid;
-    output if_parcel_misaligned;
-    output if_parcel_page_fault;
+    output pma_cfg_i;
+    output pma_adr_i;
 
-    // Data Memory Access bus
-    input  dmem_adr;
-    input  dmem_d;
-    output dmem_q;
-    input  dmem_we;
-    input  dmem_size;
-    input  dmem_req;
-    output dmem_ack;
-    output dmem_err;
-    output dmem_misaligned;
-    output dmem_page_fault;
+    // AHB3 instruction
+    input  ins_HSEL;
+    input  ins_HADDR;
+    input  ins_HWDATA;
+    output ins_HRDATA;
+    input  ins_HWRITE;
+    input  ins_HSIZE;
+    input  ins_HBURST;
+    input  ins_HPROT;
+    input  ins_HTRANS;
+    input  ins_HMASTLOCK;
+    output ins_HREADY;
+    output ins_HRESP;
 
-    // cpu state
-    input  st_prv;
-    input  st_pmpcfg;
-    input  st_pmpaddr;
-
-    input  bu_cacheflush;
+    // AHB3 data
+    input  dat_HSEL;
+    input  dat_HADDR;
+    input  dat_HWDATA;
+    output dat_HRDATA;
+    input  dat_HWRITE;
+    input  dat_HSIZE;
+    input  dat_HBURST;
+    input  dat_HPROT;
+    input  dat_HTRANS;
+    input  dat_HMASTLOCK;
+    output dat_HREADY;
+    output dat_HRESP;
 
     // Interrupts
     output ext_nmi;
@@ -188,38 +200,39 @@ interface riscv_interface #(
   endclocking : master_cb
 
   clocking slave_cb @(posedge clk);
-    input  rstn;  // Reset
-    input  clk;   // Clock
+    input  clk;
+    input  rst;
 
-    // Instruction Memory Access bus
-    input  if_stall_nxt_pc;
-    output if_nxt_pc;
-    output if_stall;
-    output if_flush;
-    input  if_parcel;
-    input  if_parcel_pc;
-    input  if_parcel_valid;
-    input  if_parcel_misaligned;
-    input  if_parcel_page_fault;
+    input  pma_cfg_i;
+    input  pma_adr_i;
 
-    // Data Memory Access bus
-    output dmem_adr;
-    output dmem_d;
-    input  dmem_q;
-    output dmem_we;
-    output dmem_size;
-    output dmem_req;
-    input  dmem_ack;
-    input  dmem_err;
-    input  dmem_misaligned;
-    input  dmem_page_fault;
+    // AHB3 instruction
+    output ins_HSEL;
+    output ins_HADDR;
+    output ins_HWDATA;
+    input  ins_HRDATA;
+    output ins_HWRITE;
+    output ins_HSIZE;
+    output ins_HBURST;
+    output ins_HPROT;
+    output ins_HTRANS;
+    output ins_HMASTLOCK;
+    input  ins_HREADY;
+    input  ins_HRESP;
 
-    // cpu state
-    output st_prv;
-    output st_pmpcfg;
-    output st_pmpaddr;
-
-    output bu_cacheflush;
+    // AHB3 data
+    output dat_HSEL;
+    output dat_HADDR;
+    output dat_HWDATA;
+    input  dat_HRDATA;
+    output dat_HWRITE;
+    output dat_HSIZE;
+    output dat_HBURST;
+    output dat_HPROT;
+    output dat_HTRANS;
+    output dat_HMASTLOCK;
+    input  dat_HREADY;
+    input  dat_HRESP;
 
     // Interrupts
     input  ext_nmi;
@@ -239,38 +252,39 @@ interface riscv_interface #(
   endclocking : slave_cb
   
   clocking monitor_cb @(posedge clk);
-    input rstn;  // Reset
-    input clk;   // Clock
+    input clk;
+    input rst;
 
-    // Instruction Memory Access bus
-    input if_stall_nxt_pc;
-    input if_nxt_pc;
-    input if_stall;
-    input if_flush;
-    input if_parcel;
-    input if_parcel_pc;
-    input if_parcel_valid;
-    input if_parcel_misaligned;
-    input if_parcel_page_fault;
+    input pma_cfg_i;
+    input pma_adr_i;
 
-    // Data Memory Access bus
-    input dmem_adr;
-    input dmem_d;
-    input dmem_q;
-    input dmem_we;
-    input dmem_size;
-    input dmem_req;
-    input dmem_ack;
-    input dmem_err;
-    input dmem_misaligned;
-    input dmem_page_fault;
+    // AHB3 instruction
+    input ins_HSEL;
+    input ins_HADDR;
+    input ins_HWDATA;
+    input ins_HRDATA;
+    input ins_HWRITE;
+    input ins_HSIZE;
+    input ins_HBURST;
+    input ins_HPROT;
+    input ins_HTRANS;
+    input ins_HMASTLOCK;
+    input ins_HREADY;
+    input ins_HRESP;
 
-    // cpu state
-    input st_prv;
-    input st_pmpcfg;
-    input st_pmpaddr;
-
-    input bu_cacheflush;
+    // AHB3 data
+    input dat_HSEL;
+    input dat_HADDR;
+    input dat_HWDATA;
+    input dat_HRDATA;
+    input dat_HWRITE;
+    input dat_HSIZE;
+    input dat_HBURST;
+    input dat_HPROT;
+    input dat_HTRANS;
+    input dat_HMASTLOCK;
+    input dat_HREADY;
+    input dat_HRESP;
 
     // Interrupts
     input ext_nmi;

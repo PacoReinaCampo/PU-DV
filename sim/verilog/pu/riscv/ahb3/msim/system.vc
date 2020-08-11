@@ -1,6 +1,8 @@
-../../../../../../pu/msp430/bench/verilog/testbench.sv
++incdir+../../../../../../pu-riscv/rtl/verilog/pkg 
 
-../../../../../../pu/msp430/rtl/verilog/design.sv
+../../../../../../pu/riscv/ahb3/bench/verilog/testbench.sv
+
+../../../../../../pu/riscv/ahb3/rtl/verilog/design.sv
 
 ../../../../../../pu-riscv/rtl/verilog/core/cache/riscv_dcache_core.sv
 ../../../../../../pu-riscv/rtl/verilog/core/cache/riscv_dext.sv
@@ -34,3 +36,12 @@
 ../../../../../../pu-riscv/rtl/verilog/core/riscv_rf.sv
 ../../../../../../pu-riscv/rtl/verilog/core/riscv_state.sv
 ../../../../../../pu-riscv/rtl/verilog/core/riscv_wb.sv
+
+../../../../../../pu-riscv/rtl/verilog/memory/riscv_ram_1r1w_generic.sv
+../../../../../../pu-riscv/rtl/verilog/memory/riscv_ram_1r1w.sv
+../../../../../../pu-riscv/rtl/verilog/memory/riscv_ram_1rw_generic.sv
+../../../../../../pu-riscv/rtl/verilog/memory/riscv_ram_1rw.sv
+../../../../../../pu-riscv/rtl/verilog/memory/riscv_ram_queue.sv
+
+../../../../../../pu-riscv/rtl/verilog/pu/riscv_biu2ahb3.sv
+../../../../../../pu-riscv/rtl/verilog/pu/riscv_pu_ahb3.sv

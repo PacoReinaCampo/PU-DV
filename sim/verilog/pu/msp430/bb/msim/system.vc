@@ -1,6 +1,8 @@
-../../../../../../pu/msp430/bench/verilog/testbench.sv
++incdir+../../../../../../pu-msp430/rtl/verilog/pkg 
 
-../../../../../../pu/msp430/rtl/verilog/design.sv
+../../../../../../pu/msp430/bb/bench/verilog/testbench.sv
+
+../../../../../../pu/msp430/bb/rtl/verilog/design.sv
 
 ../../../../../../pu-msp430/rtl/verilog/core/fuse/msp430_and_gate.sv
 ../../../../../../pu-msp430/rtl/verilog/core/fuse/msp430_clock_gate.sv

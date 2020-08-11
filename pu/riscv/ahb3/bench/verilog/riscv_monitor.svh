@@ -79,51 +79,52 @@ class riscv_monitor extends uvm_monitor;
             count++;
           end
           else begin
-            // Instruction Memory Access bus
-            pu_transaction.if_stall_nxt_pc      = or1k_vif.monitor_if_mp.monitor_cb.if_stall_nxt_pc;
-            pu_transaction.if_nxt_pc            = or1k_vif.monitor_if_mp.monitor_cb.if_nxt_pc;
-            pu_transaction.if_stall             = or1k_vif.monitor_if_mp.monitor_cb.if_stall;
-            pu_transaction.if_flush             = or1k_vif.monitor_if_mp.monitor_cb.if_flush;
-            pu_transaction.if_parcel            = or1k_vif.monitor_if_mp.monitor_cb.if_parcel;
-            pu_transaction.if_parcel_pc         = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_pc;
-            pu_transaction.if_parcel_valid      = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_valid;
-            pu_transaction.if_parcel_misaligned = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_misaligned;
-            pu_transaction.if_parcel_page_fault = or1k_vif.monitor_if_mp.monitor_cb.if_parcel_page_fault;
+            pu_transaction.pma_cfg_i     = riscv_vif.monitor_if_mp.monitor_cb.pma_cfg;
+            pu_transaction.pma_adr_i     = riscv_vif.monitor_if_mp.monitor_cb.pma_adr;
 
-            // Data Memory Access bus
-            pu_transaction.dmem_adr        = or1k_vif.monitor_if_mp.monitor_cb.dmem_adr;
-            pu_transaction.dmem_d          = or1k_vif.monitor_if_mp.monitor_cb.dmem_d;
-            pu_transaction.dmem_q          = or1k_vif.monitor_if_mp.monitor_cb.dmem_q;
-            pu_transaction.dmem_we         = or1k_vif.monitor_if_mp.monitor_cb.dmem_we;
-            pu_transaction.dmem_size       = or1k_vif.monitor_if_mp.monitor_cb.dmem_size;
-            pu_transaction.dmem_req        = or1k_vif.monitor_if_mp.monitor_cb.dmem_req;
-            pu_transaction.dmem_ack        = or1k_vif.monitor_if_mp.monitor_cb.dmem_ack;
-            pu_transaction.dmem_err        = or1k_vif.monitor_if_mp.monitor_cb.dmem_err;
-            pu_transaction.dmem_misaligned = or1k_vif.monitor_if_mp.monitor_cb.dmem_misaligned;
-            pu_transaction.dmem_page_fault = or1k_vif.monitor_if_mp.monitor_cb.dmem_page_fault;
+            // AHB3 instruction
+            pu_transaction.ins_HSEL      = riscv_vif.monitor_if_mp.monitor_cb.ins_HSEL;
+            pu_transaction.ins_HADDR     = riscv_vif.monitor_if_mp.monitor_cb.ins_HADDR;
+            pu_transaction.ins_HWDATA    = riscv_vif.monitor_if_mp.monitor_cb.ins_HWDATA;
+            pu_transaction.ins_HRDATA    = riscv_vif.monitor_if_mp.monitor_cb.ins_HRDATA;
+            pu_transaction.ins_HWRITE    = riscv_vif.monitor_if_mp.monitor_cb.ins_HWRITE;
+            pu_transaction.ins_HSIZE     = riscv_vif.monitor_if_mp.monitor_cb.ins_HSIZE;
+            pu_transaction.ins_HBURST    = riscv_vif.monitor_if_mp.monitor_cb.ins_HBURST;
+            pu_transaction.ins_HPROT     = riscv_vif.monitor_if_mp.monitor_cb.ins_HPROT;
+            pu_transaction.ins_HTRANS    = riscv_vif.monitor_if_mp.monitor_cb.ins_HTRANS;
+            pu_transaction.ins_HMASTLOCK = riscv_vif.monitor_if_mp.monitor_cb.ins_HMASTLOCK;
+            pu_transaction.ins_HREADY    = riscv_vif.monitor_if_mp.monitor_cb.ins_HREADY;
+            pu_transaction.ins_HRESP     = riscv_vif.monitor_if_mp.monitor_cb.ins_HRESP;
 
-            // cpu state
-            pu_transaction.st_prv     = or1k_vif.monitor_if_mp.monitor_cb.st_prv;
-            pu_transaction.st_pmpcfg  = or1k_vif.monitor_if_mp.monitor_cb.st_pmpcfg;
-            pu_transaction.st_pmpaddr = or1k_vif.monitor_if_mp.monitor_cb.st_pmpaddr;
-
-            pu_transaction.bu_cacheflush = or1k_vif.monitor_if_mp.monitor_cb.bu_cacheflush;
+            // AHB3 data
+            pu_transaction.dat_HSEL      = riscv_vif.monitor_if_mp.monitor_cb.dat_HSEL;
+            pu_transaction.dat_HADDR     = riscv_vif.monitor_if_mp.monitor_cb.dat_HADDR;
+            pu_transaction.dat_HWDATA    = riscv_vif.monitor_if_mp.monitor_cb.dat_HWDATA;
+            pu_transaction.dat_HRDATA    = riscv_vif.monitor_if_mp.monitor_cb.dat_HRDATA;
+            pu_transaction.dat_HWRITE    = riscv_vif.monitor_if_mp.monitor_cb.dat_HWRITE;
+            pu_transaction.dat_HSIZE     = riscv_vif.monitor_if_mp.monitor_cb.dat_HSIZE;
+            pu_transaction.dat_HBURST    = riscv_vif.monitor_if_mp.monitor_cb.dat_HBURST;
+            pu_transaction.dat_HPROT     = riscv_vif.monitor_if_mp.monitor_cb.dat_HPROT;
+            pu_transaction.dat_HTRANS    = riscv_vif.monitor_if_mp.monitor_cb.dat_HTRANS;
+            pu_transaction.dat_HMASTLOCK = riscv_vif.monitor_if_mp.monitor_cb.dat_HMASTLOCK;
+            pu_transaction.dat_HREADY    = riscv_vif.monitor_if_mp.monitor_cb.dat_HREADY;
+            pu_transaction.dat_HRESP     = riscv_vif.monitor_if_mp.monitor_cb.dat_HRESP;
 
             // Interrupts
-            pu_transaction.ext_nmi  = or1k_vif.monitor_if_mp.monitor_cb.ext_nmi;
-            pu_transaction.ext_tint = or1k_vif.monitor_if_mp.monitor_cb.ext_tint;
-            pu_transaction.ext_sint = or1k_vif.monitor_if_mp.monitor_cb.ext_sint;
-            pu_transaction.ext_int  = or1k_vif.monitor_if_mp.monitor_cb.ext_int;
+            pu_transaction.ext_nmi       = riscv_vif.monitor_if_mp.monitor_cb.ext_nmi;
+            pu_transaction.ext_tint      = riscv_vif.monitor_if_mp.monitor_cb.ext_tint;
+            pu_transaction.ext_sint      = riscv_vif.monitor_if_mp.monitor_cb.ext_sint;
+            pu_transaction.ext_int       = riscv_vif.monitor_if_mp.monitor_cb.ext_int;
 
             // Debug Interface
-            pu_transaction.dbg_stall = or1k_vif.monitor_if_mp.monitor_cb.dbg_stall;
-            pu_transaction.dbg_strb  = or1k_vif.monitor_if_mp.monitor_cb.dbg_strb;
-            pu_transaction.dbg_we    = or1k_vif.monitor_if_mp.monitor_cb.dbg_we;
-            pu_transaction.dbg_addr  = or1k_vif.monitor_if_mp.monitor_cb.dbg_addr;
-            pu_transaction.dbg_dati  = or1k_vif.monitor_if_mp.monitor_cb.dbg_dati;
-            pu_transaction.dbg_dato  = or1k_vif.monitor_if_mp.monitor_cb.dbg_dato;
-            pu_transaction.dbg_ack   = or1k_vif.monitor_if_mp.monitor_cb.dbg_ack;
-            pu_transaction.dbg_bp    = or1k_vif.monitor_if_mp.monitor_cb.dbg_bp;
+            pu_transaction.dbg_stall     = riscv_vif.monitor_if_mp.monitor_cb.dbg_stall;
+            pu_transaction.dbg_strb      = riscv_vif.monitor_if_mp.monitor_cb.dbg_strb;
+            pu_transaction.dbg_we        = riscv_vif.monitor_if_mp.monitor_cb.dbg_we;
+            pu_transaction.dbg_addr      = riscv_vif.monitor_if_mp.monitor_cb.dbg_addr;
+            pu_transaction.dbg_dati      = riscv_vif.monitor_if_mp.monitor_cb.dbg_dati;
+            pu_transaction.dbg_dato      = riscv_vif.monitor_if_mp.monitor_cb.dbg_dato;
+            pu_transaction.dbg_ack       = riscv_vif.monitor_if_mp.monitor_cb.dbg_ack;
+            pu_transaction.dbg_bp        = riscv_vif.monitor_if_mp.monitor_cb.dbg_bp;
 
             // Send transaction to Scoreboard
             monitor2scoreboard_port.write(pu_transaction);
