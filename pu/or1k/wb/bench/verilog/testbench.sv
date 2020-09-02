@@ -54,7 +54,7 @@ import uvm_pkg::*;
 `include "or1k_env.svh"
 `include "or1k_test.svh"
 
-`include "or1k-defines.sv"
+`include "or1k_defines.sv"
 
 module test;
 

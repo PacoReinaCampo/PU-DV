@@ -54,7 +54,7 @@ import uvm_pkg::*;
 `include "riscv_env.svh"
 `include "riscv_test.svh"
 
-`include "riscv_mpsoc_pkg.sv"
+`include "riscv_defines.sv"
 
 module test;
 

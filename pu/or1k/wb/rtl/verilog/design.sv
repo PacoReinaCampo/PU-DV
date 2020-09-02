@@ -39,7 +39,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "or1k-defines.sv"
+`include "or1k_defines.sv"
 
 interface or1k_interface #(
   parameter OPTION_OPERAND_WIDTH = 32,

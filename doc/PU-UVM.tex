@@ -613,6 +613,12 @@ FMV.D.X RD,FRS1 & 1111001 & 00000 & RS1 & 000 & FRD &
 \hypertarget{risc-v-machine}{%
 \paragraph{1.2.3.4. RISC-V Machine}\label{risc-v-machine}}
 
+\hypertarget{openrisc-isa}{%
+\subsection{1.3. OpenRISC ISA}\label{openrisc-isa}}
+
+\hypertarget{msp430-isa}{%
+\subsection{1.4. MSP430 ISA}\label{msp430-isa}}
+
 \hypertarget{projects}{%
 \section{2. PROJECTS}\label{projects}}
 
@@ -1234,6 +1240,1433 @@ Lock\tabularnewline
 \hypertarget{data-inputsoutputs-wishbone-bus}{%
 \paragraph{2.2.3.4. Data INPUTS/OUTPUTS Wishbone
 Bus}\label{data-inputsoutputs-wishbone-bus}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{rst} & 1 & Input & Synchronous Active High Reset\tabularnewline
+\texttt{clk} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{dadr} & \texttt{AW} & Input & Data Address Bus\tabularnewline
+\texttt{ddati} & \texttt{DW} & Input & Data Input Bus\tabularnewline
+\texttt{ddato} & \texttt{DW} & Output & Data Output Bus\tabularnewline
+\texttt{dsel} & \texttt{DW/8} & Input & Byte Select
+Signals\tabularnewline
+\texttt{dwe} & 1 & Input & Write Enable Input\tabularnewline
+\texttt{dstb} & 1 & Input & Strobe Signal/Core Select
+Input\tabularnewline
+\texttt{dcyc} & 1 & Input & Valid Bus Cycle Input\tabularnewline
+\texttt{dack} & 1 & Output & Bus Cycle Acknowledge Output\tabularnewline
+\texttt{derr} & 1 & Output & Bus Cycle Error Output\tabularnewline
+\texttt{dint} & 1 & Output & Interrupt Signal Output\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{core-or1k}{%
+\subsection{2.3. CORE-OR1K}\label{core-or1k}}
+
+\hypertarget{definition-2}{%
+\subsubsection{2.3.1. Definition}\label{definition-2}}
+
+\hypertarget{risc-pipeline-1}{%
+\subsubsection{2.3.2. RISC Pipeline}\label{risc-pipeline-1}}
+
+In computer science, instruction pipelining is a technique for
+implementing instruction-level parallelism within a PU. Pipelining
+attempts to keep every part of the processor busy with some instruction
+by dividing incoming instructions into a series of sequential steps
+performed by different PUs with different parts of instructions
+processed in parallel. It allows faster PU throughput than would
+otherwise be possible at a given clock rate.
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+Typical & Modified & Module\tabularnewline
+\midrule
+\endhead
+FETCH & FETCH & \texttt{or1k\_cache\_lru}\tabularnewline
+& & \texttt{or1k\_fetch\_cappuccino}\tabularnewline
+& & \texttt{or1k\_icache}\tabularnewline
+& & \texttt{or1k\_immu}\tabularnewline
+DECODE & DECODE & \texttt{or1k\_decode}\tabularnewline
+EXECUTE \& CONTROL & EXECUTE \& WRITE-BACK &
+\texttt{or1k\_execute\_alu}\tabularnewline
+& & \texttt{or1k\_execute\_ctrl\_cappuccino}\tabularnewline
+& & \texttt{or1k\_rf\_cappuccino}\tabularnewline
+& & \texttt{or1k\_wb\_mux\_cappuccino}\tabularnewline
+MEMORY & MEMORY & \texttt{or1k\_dcache}\tabularnewline
+& & \texttt{or1k\_dmmu}\tabularnewline
+& & \texttt{or1k\_lsu\_cappuccino}\tabularnewline
+& & \texttt{or1k\_store\_buffer}\tabularnewline
+WRITE-BACK & CONTROL & \texttt{or1k\_cfgrs}\tabularnewline
+& & \texttt{or1k\_ctrl\_cappuccino}\tabularnewline
+& & \texttt{or1k\_pcu}\tabularnewline
+& & \texttt{or1k\_pic}\tabularnewline
+& & \texttt{or1k\_ticktimer}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{itemize}
+\item
+  IF -- Instruction Fetch Unit : Send out the PC and fetch the
+  instruction from memory into the Instruction Register (IR); increment
+  the PC to address the next sequential instruction. The IR is used to
+  hold the next instruction that will be needed on subsequent clock
+  cycles; likewise the register NPC is used to hold the next sequential
+  PC.
+\item
+  ID -- Instruction Decode Unit : Decode the instruction and access the
+  register file to read the registers. This unit gets instruction from
+  IF, and extracts opcode and operand from that instruction. It also
+  retrieves register values if requested by the operation.
+\item
+  EX -- Execution Unit : The ALU operates on the operands prepared in
+  prior cycle, performing one functions depending on instruction type.
+\item
+  MEM -- Memory Access Unit : Instructions active in this unit are
+  loads, stores and branches.
+\item
+  WB -- WriteBack Unit : Write the result into the register file,
+  whether it comes from the memory system or from the ALU.
+\end{itemize}
+
+\hypertarget{core-or1k-organization}{%
+\subsubsection{2.3.3. CORE-OR1K
+Organization}\label{core-or1k-organization}}
+
+The CORE-OR1K is based on the Harvard architecture, which is a computer
+architecture with separate storage and signal pathways for instructions
+and data. The implementation is heavily modular, with each particular
+functional block of the design being contained within its own HDL module
+or modules. The OR1K implementation was developed in order to provide a
+better platform for processor component development than previous
+implementations.
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+\begin{minipage}[b]{0.28\columnwidth}\raggedright
+Core\strut
+\end{minipage} & \begin{minipage}[b]{0.66\columnwidth}\raggedright
+Module description\strut
+\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{or1k\_core}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Top-level, instantiatng bus interfaces, data cache and CPU\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{...or1k\_dcache}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Data cache implementation\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{...or1k\_bus\_if\_xx}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Bus interface, depending on desired bus standard\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{...or1k\_cpu}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Pipeline implementation wrapper\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.....or1k\_cpu\_xx}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Pipeline implementation, depending on configuration\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.......or1k\_fetch\_xx}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Pipeline-implementation-dependent fetch stage\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.......or1k\_decode}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Generic decode stage\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.......or1k\_execute\_alu}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Generic ALU for execute stage\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.......or1k\_lsu\_xx}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Pipeline-implementation-dependent load/store unit\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.......or1k\_wb\_mux\_xx}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Pipeline-implementation-dependent writeback stage mux\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.......or1k\_rf\_xx}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Pipeline-implementation-dependent register file\strut
+\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.28\columnwidth}\raggedright
+\texttt{.......or1k\_ctrl\_xx}\strut
+\end{minipage} & \begin{minipage}[t]{0.66\columnwidth}\raggedright
+Pipeline-implementation-dependent control stage\strut
+\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+In a Harvard architecture, there is no need to make the two memories
+share characteristics. In particular, the word width, timing,
+implementation technology, and memory address structure can differ. In
+some systems, instructions for pre-programmed tasks can be stored in
+read-only memory while data memory generally requires read-write memory.
+In some systems, there is much more instruction memory than data memory
+so instruction addresses are wider than data addresses.
+
+\hypertarget{parameters-1}{%
+\subsubsection{2.3.4. Parameters}\label{parameters-1}}
+
+\hypertarget{basic-parameters}{%
+\paragraph{2.3.4.1. Basic Parameters}\label{basic-parameters}}
+
+\begin{longtable}[]{@{}llcc@{}}
+\toprule
+Parameter & Description & Default & Values\tabularnewline
+\midrule
+\endhead
+OPTION\_OPERAND\_WIDTH & CPU data and address widths & 32 & 32,
+64\tabularnewline
+OPTION\_CPU0 & CPU pipeline core & \texttt{CAPPUCCINO} &
+\texttt{CAPPUCCINO}\tabularnewline
+OPTION\_RESET\_PC & Program Counter upon reset & \texttt{0x100} &
+N\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{caching-parameters}{%
+\paragraph{2.3.4.2. Caching Parameters}\label{caching-parameters}}
+
+\begin{longtable}[]{@{}llcc@{}}
+\toprule
+Parameter & Description & Default & Values\tabularnewline
+\midrule
+\endhead
+FEATURE\_DATACACHE & Enable memory access data caching & \texttt{NONE} &
+\texttt{ENABLED}\tabularnewline
+OPTION\_DCACHE\_BLOCK\_WIDTH & Address width of a cache block & 5 &
+\texttt{n}\tabularnewline
+OPTION\_DCACHE\_SET\_WIDTH & Set address width & 9 &
+\texttt{n}\tabularnewline
+OPTION\_DCACHE\_WAYS & Number of blocks per set & 2 &
+\texttt{n}\tabularnewline
+OPTION\_DCACHE\_LIMIT\_WIDTH & Maximum address width & 32 &
+\texttt{n}\tabularnewline
+OPTION\_DCACHE\_SNOOP & Bus snooping for cache coherency & \texttt{NONE}
+& \texttt{ENABLED}\tabularnewline
+FEATURE\_INSTRUCTIONCACHE & Memory access instruction caching &
+\texttt{NONE} & \texttt{ENABLED}\tabularnewline
+OPTION\_ICACHE\_BLOCK\_WIDTH & Address width of a cache block & 5 &
+\texttt{n}\tabularnewline
+OPTION\_ICACHE\_SET\_WIDTH & Set address width & 9 &
+\texttt{n}\tabularnewline
+OPTION\_ICACHE\_WAYS & Number of blocks per set & 2 &
+\texttt{n}\tabularnewline
+OPTION\_ICACHE\_LIMIT\_WIDTH & Maximum address width & 32 &
+\texttt{n}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{memory-management-unit-mmu-parameters}{%
+\paragraph{2.3.4.3. Memory Management Unit (MMU)
+Parameters}\label{memory-management-unit-mmu-parameters}}
+
+\begin{longtable}[]{@{}llcc@{}}
+\toprule
+Parameter & Description & Default & Values\tabularnewline
+\midrule
+\endhead
+FEATURE\_DMMU & Enable the data bus MMU & \texttt{NONE} &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_DMMU\_HW\_TLB\_RELOAD & Enable hardware TLB reload &
+\texttt{NONE} & \texttt{ENABLED}\tabularnewline
+OPTION\_DMMU\_SET\_WIDTH & Set address width & 6 &
+\texttt{n}\tabularnewline
+OPTION\_DMMU\_WAYS & Number of ways per set & 1 &
+\texttt{n}\tabularnewline
+FEATURE\_IMMU & Enable the instruction bus MMU & \texttt{NONE} &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_IMMU\_HW\_TLB\_RELOAD & Enable hardware TLB reload &
+\texttt{NONE} & \texttt{ENABLED}\tabularnewline
+OPTION\_IMMU\_SET\_WIDTH & Set address width & 6 &
+\texttt{n}\tabularnewline
+OPTION\_IMMU\_WAYS & Number of ways per set & 1 &
+\texttt{n}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{system-bus-parameters}{%
+\paragraph{2.3.4.4. System Bus Parameters}\label{system-bus-parameters}}
+
+\begin{longtable}[]{@{}llc@{}}
+\toprule
+Parameter & Description & Default\tabularnewline
+\midrule
+\endhead
+FEATURE\_STORE\_BUFFER & Load store unit store buffer &
+\texttt{ENABLED}\tabularnewline
+OPTION\_STORE\_BUFFER\_DEPTH\_WIDTH & Load store unit store buffer depth
+& 8\tabularnewline
+BUS\_IF\_TYPE & Bus interface type & \texttt{WISHBONE32}\tabularnewline
+IBUS\_WB\_TYPE & Instruction bus interface &
+\texttt{B3\_READ\_BURSTING}\tabularnewline
+DBUS\_WB\_TYPE & Data bus interface type option &
+\texttt{CLASSIC}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{hardware-unit-configuration-parameters}{%
+\paragraph{2.3.4.5. Hardware Unit Configuration
+Parameters}\label{hardware-unit-configuration-parameters}}
+
+\begin{longtable}[]{@{}llc@{}}
+\toprule
+Parameter & Description & Default\tabularnewline
+\midrule
+\endhead
+FEATURE\_TRACEPORT\_EXEC & Traceport hardware interface &
+\texttt{NONE}\tabularnewline
+FEATURE\_DEBUGUNIT & Hardware breakpoints and debug unit &
+\texttt{NONE}\tabularnewline
+FEATURE\_PERFCOUNTERS & Performance counters unit &
+\texttt{NONE}\tabularnewline
+OPTION\_PERFCOUNTERS\_NUM & Performance counters to generate &
+0\tabularnewline
+FEATURE\_TIMER & Internal OpenRISC timer &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_PIC & Internal OpenRISC PIC & \texttt{ENABLED}\tabularnewline
+OPTION\_PIC\_TRIGGER & PIC trigger mode & \texttt{LEVEL}\tabularnewline
+OPTION\_PIC\_NMI\_WIDTH & Non maskable interrupts width &
+0\tabularnewline
+OPTION\_RF\_CLEAR\_ON\_INIT & clearing all registers on initialization &
+0\tabularnewline
+OPTION\_RF\_NUM\_SHADOW\_GPR & Number of shadow register files &
+0\tabularnewline
+OPTION\_RF\_ADDR\_WIDTH & Address width of the register file &
+5\tabularnewline
+OPTION\_RF\_WORDS & Number of registers in the register file &
+32\tabularnewline
+FEATURE\_FASTCONTEXTS & Fast context switching of register sets &
+\texttt{NONE}\tabularnewline
+FEATURE\_MULTICORE & \texttt{coreid} and \texttt{numcores} SPR registers
+& \texttt{NONE}\tabularnewline
+FEATURE\_FPU & FPU, for cappuccino pipeline only &
+\texttt{NONE}\tabularnewline
+OPTION\_FTOI\_ROUNDING & Rounding behavior for \texttt{lf.ftoi.s} &
+\texttt{CPP}\tabularnewline
+FEATURE\_BRANCH\_PREDICTOR & Branch predictor implementation &
+\texttt{SIMPLE}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{exception-handling-options}{%
+\paragraph{2.3.4.6. Exception Handling
+Options}\label{exception-handling-options}}
+
+\begin{longtable}[]{@{}llc@{}}
+\toprule
+Parameter & Description & Default\tabularnewline
+\midrule
+\endhead
+FEATURE\_DSX & Enable setting the \texttt{SR{[}DSX{]}} flag &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_RANGE & Enable checking and raising range exceptions &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_OVERFLOW & Enable checking and raising overflow exceptions &
+\texttt{ENABLED}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{alu-configuration-options}{%
+\paragraph{2.3.4.7. ALU Configuration
+Options}\label{alu-configuration-options}}
+
+\begin{longtable}[]{@{}llc@{}}
+\toprule
+Parameter & Description & Default\tabularnewline
+\midrule
+\endhead
+FEATURE\_MULTIPLIER & Specify the multiplier implementation &
+\texttt{THREESTAGE}\tabularnewline
+FEATURE\_DIVIDER & Specify the divider implementation &
+\texttt{SERIAL}\tabularnewline
+OPTION\_SHIFTER & Specify the shifter implementation &
+\texttt{BARREL}\tabularnewline
+FEATURE\_CARRY\_FLAG & Enable checking and setting the carry flag &
+\texttt{ENABLED}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-enabling-options}{%
+\paragraph{2.3.4.8. Instruction Enabling
+Options}\label{instruction-enabling-options}}
+
+\begin{longtable}[]{@{}llc@{}}
+\toprule
+Parameter & Description & Default\tabularnewline
+\midrule
+\endhead
+FEATURE\_MAC & \texttt{l.mac*} multiply accumulate instructions &
+\texttt{NONE}\tabularnewline
+FEATURE\_SYSCALL & \texttt{l.sys} OS syscall instruction &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_TRAP & \texttt{l.trap} instruction &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_ADDC & \texttt{l.addc} add with \texttt{carry} flag instruction
+& \texttt{ENABLED}\tabularnewline
+FEATURE\_SRA & \texttt{l.sra} shirt right arithmetic instruction &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_ROR & \texttt{l.ror*} rotate right instructions &
+\texttt{NONE}\tabularnewline
+FEATURE\_EXT & \texttt{l.ext*} sign extend instructions &
+\texttt{NONE}\tabularnewline
+FEATURE\_CMOV & \texttt{l.cmov} conditional move instruction &
+\texttt{ENABLED}\tabularnewline
+FEATURE\_FFL1 & \texttt{l.f{[}fl{]}1} find first/last set bit
+instructions & \texttt{ENABLED}\tabularnewline
+FEATURE\_ATOMIC & \texttt{l.lwa} and \texttt{l.swa} atomic instructions
+& \texttt{ENABLED}\tabularnewline
+FEATURE\_CUST1 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+FEATURE\_CUST2 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+FEATURE\_CUST3 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+FEATURE\_CUST4 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+FEATURE\_CUST5 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+FEATURE\_CUST6 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+FEATURE\_CUST7 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+FEATURE\_CUST8 & \texttt{l.cust*} custom instruction &
+\texttt{NONE}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-bus-1}{%
+\subsubsection{2.3.5. Instruction Inputs/Outputs
+Bus}\label{instruction-inputsoutputs-bus-1}}
+
+\hypertarget{data-inputsoutputs-bus-1}{%
+\subsubsection{2.3.6. Data Inputs/Outputs
+Bus}\label{data-inputsoutputs-bus-1}}
+
+\hypertarget{pu-or1k}{%
+\subsection{2.4. PU-OR1K}\label{pu-or1k}}
+
+\hypertarget{definition-3}{%
+\subsubsection{2.4.1. Definition}\label{definition-3}}
+
+The OpenRISC implementation has a 32/64 bit Microarchitecture, 5 stages
+data pipeline and an Instruction Set Architecture based on Reduced
+Instruction Set Computer. Compatible with Wishbone Bus. Only For
+Researching.
+
+A PU cache is a hardware cache used by the PU to reduce the average cost
+(time or energy) to access instruction/data from the main memory. A
+cache is a smaller, faster memory, closer to a core, which stores copies
+of the data from frequently used main memory locations. Most CPUs have
+different independent caches, including instruction and data caches.
+
+\hypertarget{instruction-cache-1}{%
+\subsubsection{2.4.2. Instruction Cache}\label{instruction-cache-1}}
+
+\hypertarget{instruction-organization-1}{%
+\paragraph{2.4.2.1. Instruction
+Organization}\label{instruction-organization-1}}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+Instruction Memory & Module description\tabularnewline
+\midrule
+\endhead
+\texttt{riscv\_imem\_ctrl} & Instruction Memory Access
+Block\tabularnewline
+\texttt{...riscv\_membuf} & Memory Access Buffer\tabularnewline
+\texttt{.....riscv\_ram\_queue} & Fall-through Queue\tabularnewline
+\texttt{...riscv\_memmisaligned} & Misalignment Check\tabularnewline
+\texttt{...riscv\_mmu} & Memory Management Unit\tabularnewline
+\texttt{...riscv\_pmachk} & Physical Memory Attributes
+Checker\tabularnewline
+\texttt{...riscv\_pmpchk} & Physical Memory Protection
+Checker\tabularnewline
+\texttt{...riscv\_icache\_core} & Instruction Cache (Write
+Back)\tabularnewline
+\texttt{.....riscv\_ram\_1rw} & RAM 1RW\tabularnewline
+\texttt{.......riscv\_ram\_1rw\_generic} & RAM 1RW
+Generic\tabularnewline
+\texttt{...riscv\_dext} & Data External Access Logic\tabularnewline
+\texttt{...riscv\_ram\_queue} & Fall-through Queue\tabularnewline
+\texttt{...riscv\_mux} & Bus-Interface-Unit Mux\tabularnewline
+\texttt{riscv\_biu} & Bus Interface Unit\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-amba4-axi-lite-bus-1}{%
+\paragraph{2.4.2.2. Instruction INPUTS/OUTPUTS AMBA4 AXI-Lite
+Bus}\label{instruction-inputsoutputs-amba4-axi-lite-bus-1}}
+
+\hypertarget{signals-of-the-read-and-write-address-channels-2}{%
+\subparagraph{2.4.2.2.1. Signals of the Read and Write Address
+channels}\label{signals-of-the-read-and-write-address-channels-2}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{AWID} & \texttt{ARID} & \texttt{AXI\_ID\_WIDTH} & Output &
+Address ID, to identify multiple streams\tabularnewline
+\texttt{AWADDR} & \texttt{ARADDR} & \texttt{AXI\_ADDR\_WIDTH} & Output &
+Address of the first beat of the burst\tabularnewline
+\texttt{AWLEN} & \texttt{ARLEN} & 8 & Output & Number of beats inside
+the burst\tabularnewline
+\texttt{AWSIZE} & \texttt{ARSIZE} & 3 & Output & Size of each
+beat\tabularnewline
+\texttt{AWBURST} & \texttt{ARBURST} & 2 & Output & Type of the
+burst\tabularnewline
+\texttt{AWLOCK} & \texttt{ARLOCK} & 1 & Output & Lock type, to provide
+atomic operations\tabularnewline
+\texttt{AWCACHE} & \texttt{ARCACHE} & 4 & Output & Memory type, progress
+through the system\tabularnewline
+\texttt{AWPROT} & \texttt{ARPROT} & 3 & Output & Protection
+type\tabularnewline
+\texttt{AWQOS} & \texttt{ARQOS} & 4 & Output & Quality of Service of the
+transaction\tabularnewline
+\texttt{AWREGION} & \texttt{ARREGION} & 4 & Output & Region identifier,
+physical to logical\tabularnewline
+\texttt{AWUSER} & \texttt{ARUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{AWVALID} & \texttt{ARVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{AWREADY} & \texttt{ARREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-read-and-write-data-channels-2}{%
+\subparagraph{2.4.2.2.2. Signals of the Read and Write Data
+channels}\label{signals-of-the-read-and-write-data-channels-2}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{WID} & \texttt{RID} & \texttt{AXI\_ID\_WIDTH} & Output & Data
+ID, to identify multiple streams\tabularnewline
+\texttt{WDATA} & \texttt{RDATA} & \texttt{AXI\_DATA\_WIDTH} & Output &
+Read/Write data\tabularnewline
+\texttt{-\/-} & \texttt{RRESP} & 2 & Output & Read response, current
+RDATA status\tabularnewline
+\texttt{WSTRB} & \texttt{-\/-} & \texttt{AXI\_STRB\_WIDTH} & Output &
+Byte strobe, WDATA signal\tabularnewline
+\texttt{WLAST} & \texttt{RLAST} & 1 & Output & Last beat
+identifier\tabularnewline
+\texttt{WUSER} & \texttt{RUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{WVALID} & \texttt{RVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{WREADY} & \texttt{RREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-write-response-channel-2}{%
+\subparagraph{2.4.2.2.3. Signals of the Write Response
+channel}\label{signals-of-the-write-response-channel-2}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Write Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{BID} & \texttt{AXI\_ID\_WIDTH} & Input & Write response ID, to
+identify multiple streams\tabularnewline
+\texttt{BRESP} & 2 & Input & Write response, to specify the burst
+status\tabularnewline
+\texttt{BUSER} & \texttt{AXI\_USER\_WIDTH} & Input & User-defined
+data\tabularnewline
+\texttt{BVALID} & 1 & Input & xVALID handshake signal\tabularnewline
+\texttt{BREADY} & 1 & Output & xREADY handshake signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-amba3-ahb-lite-bus-1}{%
+\paragraph{2.4.2.3. Instruction INPUTS/OUTPUTS AMBA3 AHB-Lite
+Bus}\label{instruction-inputsoutputs-amba3-ahb-lite-bus-1}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{HRESETn} & 1 & Input & Asynchronous Active Low
+Reset\tabularnewline
+\texttt{HCLK} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{IHSEL} & 1 & Output & Instruction Bus Select\tabularnewline
+\texttt{IHADDR} & \texttt{PLEN} & Output & Instruction Address
+Bus\tabularnewline
+\texttt{IHRDATA} & \texttt{XLEN} & Input & Instruction Read Data
+Bus\tabularnewline
+\texttt{IHWDATA} & \texttt{XLEN} & Output & Instruction Write Data
+Bus\tabularnewline
+\texttt{IHWRITE} & 1 & Output & Instruction Write Select\tabularnewline
+\texttt{IHSIZE} & 3 & Output & Instruction Transfer Size\tabularnewline
+\texttt{IHBURST} & 3 & Output & Instruction Transfer Burst
+Size\tabularnewline
+\texttt{IHPROT} & 4 & Output & Instruction Transfer Protection
+Level\tabularnewline
+\texttt{IHTRANS} & 2 & Output & Instruction Transfer Type\tabularnewline
+\texttt{IHMASTLOCK} & 1 & Output & Instruction Transfer Master
+Lock\tabularnewline
+\texttt{IHREADY} & 1 & Input & Instruction Slave Ready
+Indicator\tabularnewline
+\texttt{IHRESP} & 1 & Input & Instruction Transfer
+Response\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-wishbone-bus-1}{%
+\paragraph{2.4.2.4. Instruction INPUTS/OUTPUTS Wishbone
+Bus}\label{instruction-inputsoutputs-wishbone-bus-1}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{rst} & 1 & Input & Synchronous Active High Reset\tabularnewline
+\texttt{clk} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{iadr} & \texttt{AW} & Input & Instruction Address
+Bus\tabularnewline
+\texttt{idati} & \texttt{DW} & Input & Instruction Input
+Bus\tabularnewline
+\texttt{idato} & \texttt{DW} & Output & Instruction Output
+Bus\tabularnewline
+\texttt{isel} & \texttt{DW/8} & Input & Byte Select
+Signals\tabularnewline
+\texttt{iwe} & 1 & Input & Write Enable Input\tabularnewline
+\texttt{istb} & 1 & Input & Strobe Signal/Core Select
+Input\tabularnewline
+\texttt{icyc} & 1 & Input & Valid Bus Cycle Input\tabularnewline
+\texttt{iack} & 1 & Output & Bus Cycle Acknowledge Output\tabularnewline
+\texttt{ierr} & 1 & Output & Bus Cycle Error Output\tabularnewline
+\texttt{iint} & 1 & Output & Interrupt Signal Output\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-cache-1}{%
+\subsubsection{2.4.3. Data Cache}\label{data-cache-1}}
+
+\hypertarget{data-organization-1}{%
+\paragraph{2.4.3.1. Data Organization}\label{data-organization-1}}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+Data Memory & Module description\tabularnewline
+\midrule
+\endhead
+\texttt{riscv\_dmem\_ctrl} & Data Memory Access Block\tabularnewline
+\texttt{...riscv\_membuf} & Memory Access Buffer\tabularnewline
+\texttt{.....riscv\_ram\_queue} & Fall-through Queue\tabularnewline
+\texttt{...riscv\_memmisaligned} & Misalignment Check\tabularnewline
+\texttt{...riscv\_mmu} & Memory Management Unit\tabularnewline
+\texttt{...riscv\_pmachk} & Physical Memory Attributes
+Checker\tabularnewline
+\texttt{...riscv\_pmpchk} & Physical Memory Protection
+Checker\tabularnewline
+\texttt{...riscv\_dcache\_core} & Data Cache (Write Back)\tabularnewline
+\texttt{.....riscv\_ram\_1rw} & RAM 1RW\tabularnewline
+\texttt{.......riscv\_ram\_1rw\_generic} & RAM 1RW
+Generic\tabularnewline
+\texttt{...riscv\_dext} & Data External Access Logic\tabularnewline
+\texttt{...riscv\_mux} & Bus-Interface-Unit Mux\tabularnewline
+\texttt{riscv\_biu} & Bus Interface Unit\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-inputsoutputs-amba4-axi-lite-bus-1}{%
+\paragraph{2.4.3.2. Data INPUTS/OUTPUTS AMBA4 AXI-Lite
+Bus}\label{data-inputsoutputs-amba4-axi-lite-bus-1}}
+
+\hypertarget{signals-of-the-read-and-write-address-channels-3}{%
+\subparagraph{2.4.3.2.1. Signals of the Read and Write Address
+channels}\label{signals-of-the-read-and-write-address-channels-3}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{AWID} & \texttt{ARID} & \texttt{AXI\_ID\_WIDTH} & Output &
+Address ID, to identify multiple streams\tabularnewline
+\texttt{AWADDR} & \texttt{ARADDR} & \texttt{AXI\_ADDR\_WIDTH} & Output &
+Address of the first beat of the burst\tabularnewline
+\texttt{AWLEN} & \texttt{ARLEN} & 8 & Output & Number of beats inside
+the burst\tabularnewline
+\texttt{AWSIZE} & \texttt{ARSIZE} & 3 & Output & Size of each
+beat\tabularnewline
+\texttt{AWBURST} & \texttt{ARBURST} & 2 & Output & Type of the
+burst\tabularnewline
+\texttt{AWLOCK} & \texttt{ARLOCK} & 1 & Output & Lock type, to provide
+atomic operations\tabularnewline
+\texttt{AWCACHE} & \texttt{ARCACHE} & 4 & Output & Memory type, progress
+through the system\tabularnewline
+\texttt{AWPROT} & \texttt{ARPROT} & 3 & Output & Protection
+type\tabularnewline
+\texttt{AWQOS} & \texttt{ARQOS} & 4 & Output & Quality of Service of the
+transaction\tabularnewline
+\texttt{AWREGION} & \texttt{ARREGION} & 4 & Output & Region identifier,
+physical to logical\tabularnewline
+\texttt{AWUSER} & \texttt{ARUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{AWVALID} & \texttt{ARVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{AWREADY} & \texttt{ARREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-read-and-write-data-channels-3}{%
+\subparagraph{2.4.3.2.2. Signals of the Read and Write Data
+channels}\label{signals-of-the-read-and-write-data-channels-3}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{WID} & \texttt{RID} & \texttt{AXI\_ID\_WIDTH} & Output & Data
+ID, to identify multiple streams\tabularnewline
+\texttt{WDATA} & \texttt{RDATA} & \texttt{AXI\_DATA\_WIDTH} & Output &
+Read/Write data\tabularnewline
+\texttt{-\/-} & \texttt{RRESP} & 2 & Output & Read response, current
+RDATA status\tabularnewline
+\texttt{WSTRB} & \texttt{-\/-} & \texttt{AXI\_STRB\_WIDTH} & Output &
+Byte strobe, WDATA signal\tabularnewline
+\texttt{WLAST} & \texttt{RLAST} & 1 & Output & Last beat
+identifier\tabularnewline
+\texttt{WUSER} & \texttt{RUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{WVALID} & \texttt{RVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{WREADY} & \texttt{RREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-write-response-channel-3}{%
+\subparagraph{2.4.3.2.3. Signals of the Write Response
+channel}\label{signals-of-the-write-response-channel-3}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Write Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{BID} & \texttt{AXI\_ID\_WIDTH} & Input & Write response ID, to
+identify multiple streams\tabularnewline
+\texttt{BRESP} & 2 & Input & Write response, to specify the burst
+status\tabularnewline
+\texttt{BUSER} & \texttt{AXI\_USER\_WIDTH} & Input & User-defined
+data\tabularnewline
+\texttt{BVALID} & 1 & Input & xVALID handshake signal\tabularnewline
+\texttt{BREADY} & 1 & Output & xREADY handshake signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-inputsoutputs-amba3-ahb-lite-bus-1}{%
+\paragraph{2.4.3.3. Data INPUTS/OUTPUTS AMBA3 AHB-Lite
+Bus}\label{data-inputsoutputs-amba3-ahb-lite-bus-1}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{HRESETn} & 1 & Input & Asynchronous Active Low
+Reset\tabularnewline
+\texttt{HCLK} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{DHSEL} & 1 & Output & Data Bus Select\tabularnewline
+\texttt{DHADDR} & \texttt{PLEN} & Output & Data Address
+Bus\tabularnewline
+\texttt{DHRDATA} & \texttt{XLEN} & Input & Data Read Data
+Bus\tabularnewline
+\texttt{DHWDATA} & \texttt{XLEN} & Output & Data Write Data
+Bus\tabularnewline
+\texttt{DHWRITE} & 1 & Output & Data Write Select\tabularnewline
+\texttt{DHSIZE} & 3 & Output & Data Transfer Size\tabularnewline
+\texttt{DHBURST} & 3 & Output & Data Transfer Burst Size\tabularnewline
+\texttt{DHPROT} & 4 & Output & Data Transfer Protection
+Level\tabularnewline
+\texttt{DHTRANS} & 2 & Output & Data Transfer Type\tabularnewline
+\texttt{DHMASTLOCK} & 1 & Output & Data Transfer Master
+Lock\tabularnewline
+\texttt{DHREADY} & 1 & Input & Data Slave Ready Indicator\tabularnewline
+\texttt{DHRESP} & 1 & Input & Data Transfer Response\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-inputsoutputs-wishbone-bus-1}{%
+\paragraph{2.4.3.4. Data INPUTS/OUTPUTS Wishbone
+Bus}\label{data-inputsoutputs-wishbone-bus-1}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{rst} & 1 & Input & Synchronous Active High Reset\tabularnewline
+\texttt{clk} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{dadr} & \texttt{AW} & Input & Data Address Bus\tabularnewline
+\texttt{ddati} & \texttt{DW} & Input & Data Input Bus\tabularnewline
+\texttt{ddato} & \texttt{DW} & Output & Data Output Bus\tabularnewline
+\texttt{dsel} & \texttt{DW/8} & Input & Byte Select
+Signals\tabularnewline
+\texttt{dwe} & 1 & Input & Write Enable Input\tabularnewline
+\texttt{dstb} & 1 & Input & Strobe Signal/Core Select
+Input\tabularnewline
+\texttt{dcyc} & 1 & Input & Valid Bus Cycle Input\tabularnewline
+\texttt{dack} & 1 & Output & Bus Cycle Acknowledge Output\tabularnewline
+\texttt{derr} & 1 & Output & Bus Cycle Error Output\tabularnewline
+\texttt{dint} & 1 & Output & Interrupt Signal Output\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{core-msp430}{%
+\subsection{2.5. CORE-MSP430}\label{core-msp430}}
+
+\hypertarget{definition-4}{%
+\subsubsection{2.5.1. Definition}\label{definition-4}}
+
+\hypertarget{risc-pipeline-2}{%
+\subsubsection{2.5.2. RISC Pipeline}\label{risc-pipeline-2}}
+
+\hypertarget{core-msp430-organization}{%
+\subsubsection{2.5.3. CORE-MSP430
+Organization}\label{core-msp430-organization}}
+
+\hypertarget{parameters-2}{%
+\subsubsection{2.5.4. Parameters}\label{parameters-2}}
+
+\hypertarget{basic-system-configuration}{%
+\paragraph{2.5.4.1. Basic System
+Configuration}\label{basic-system-configuration}}
+
+\begin{longtable}[]{@{}lccc@{}}
+\toprule
+Description & Parameter & Type & Default\tabularnewline
+\midrule
+\endhead
+Program Memory Size & PMEM\_SIZE & integer & 16384\tabularnewline
+Data Memory Size & DMEM\_SIZE & integer & 4096\tabularnewline
+Include/Exclude Hardware Multiplier & MULTIPLYING & bit &
+1\tabularnewline
+Include/Exclude Serial Debug interface & DBG\_ON & bit &
+1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{advanced-system-configuration-for-experienced-users}{%
+\paragraph{2.5.4.2. Advanced System Configuration (for experienced
+users)}\label{advanced-system-configuration-for-experienced-users}}
+
+\begin{longtable}[]{@{}lccc@{}}
+\toprule
+Description & Parameter & Type & Default\tabularnewline
+\midrule
+\endhead
+Peripheral Memory Space & PER\_SIZE & integer & 512\tabularnewline
+Custom user version number & USER\_VERSION & bit vector &
+0\tabularnewline
+Watchdog timer & WATCHDOG & bit & 1\tabularnewline
+Non-Maskable-Interrupt support & NMI\_EN & bit & 1\tabularnewline
+Number of available IRQs & IRQ\_16 & bit & 1\tabularnewline
+Number of available IRQs & IRQ\_32 & bit & 0\tabularnewline
+Number of available IRQs & IRQ\_64 & bit & 0\tabularnewline
+Input synchronizers & SYNC\_NMI & bit & 1\tabularnewline
+Input synchronizers & SYNC\_CPU\_EN & bit & 0\tabularnewline
+Input synchronizers & SYNC\_DBG\_EN & bit & 0\tabularnewline
+Debugger definition & DBG\_RST\_BRK\_EN & bit & 0\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{expert-system-configuration-experts-only}{%
+\paragraph{2.5.4.3. Expert System Configuration (experts
+only)}\label{expert-system-configuration-experts-only}}
+
+\begin{longtable}[]{@{}lccc@{}}
+\toprule
+Description & Parameter & Type & Default\tabularnewline
+\midrule
+\endhead
+Hardware breakpoint/watchpoint units & DBG\_HWBRK & bit vector &
+1\tabularnewline
+Select serial debug interface protocol & DBG\_UART & bit &
+0\tabularnewline
+Select serial debug interface protocol & DBG\_I2C & bit &
+1\tabularnewline
+I2C broadcast address & DBG\_I2C\_BROADCASTC & bit & 1\tabularnewline
+Hardware breakpoint RANGE mode & HWBRK\_RANGE & bit & 1\tabularnewline
+ASIC version & ASIC & bit & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{asic-system-configuration-expertsprofessionals-only}{%
+\paragraph{2.5.4.4. ASIC System Configuration (experts/professionals
+only)}\label{asic-system-configuration-expertsprofessionals-only}}
+
+\begin{longtable}[]{@{}lccc@{}}
+\toprule
+Description & Parameter & Type & Default\tabularnewline
+\midrule
+\endhead
+LOW POWER MODE: SCG & SCG\_EN & bit vector & 1\tabularnewline
+FINE GRAINED CLOCK GATING & CLOCK\_GATING & bit & 1\tabularnewline
+ASIC CLOCKING & ASIC\_CLOCKING & bit & 1\tabularnewline
+LFXT CLOCK DOMAIN & LFXT\_DOMAIN & bit & 1\tabularnewline
+MCLK: Clock Mux & MCLK\_MUX & bit & 1\tabularnewline
+SMCLK: Clock Mux & SMCLK\_MUX & bit & 1\tabularnewline
+WATCHDOG: Clock Mux & WATCHDOG\_MUX & bit & 1\tabularnewline
+WATCHDOG: Clock No-Mux & WATCHDOG\_NOMUX\_ACLK & bit & 0\tabularnewline
+MCLK: Clock divider & MCLK\_DIVIDER & bit & 1\tabularnewline
+SMCLK: Clock divider (/1/2/4/8) & SMCLK\_DIVIDER & bit &
+1\tabularnewline
+ACLK: Clock divider (/1/2/4/8) & ACLK\_DIVIDER & bit & 1\tabularnewline
+LOW POWER MODE: CPUOFF & CPUOFF\_EN & bit & 1\tabularnewline
+LOW POWER MODE: OSCOFF & OSCOFF\_EN & bit & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{system-constants-do-not-edit}{%
+\paragraph{2.5.4.5. System Constants (do not
+edit)}\label{system-constants-do-not-edit}}
+
+\begin{longtable}[]{@{}lccc@{}}
+\toprule
+Description & Parameter & Type & Default\tabularnewline
+\midrule
+\endhead
+Program Memory Size & PMEM\_AWIDTH & integer & 13\tabularnewline
+Data Memory Size & DMEM\_AWIDTH & integer & 11\tabularnewline
+Peripheral Memory Size & PER\_AWIDTH & integer & 8\tabularnewline
+Data Memory Base Adresses & DMEM\_BASE & integer & N\tabularnewline
+Program Memory & PMEM\_MSB & integer & N\tabularnewline
+Data Memory & DMEM\_MSB & integer & N\tabularnewline
+Peripheral Memory & PER\_MSB & integer & N\tabularnewline
+Number of available IRQs & IRQ\_NR & integer & 16\tabularnewline
+Instructions type & INST\_SOC & integer & 0\tabularnewline
+Instructions type & INST\_JMPC & integer & 1\tabularnewline
+Instructions type & INST\_TOC & integer & 2\tabularnewline
+Single-operand arithmetic & RRC & integer & 0\tabularnewline
+Single-operand arithmetic & SWPB & integer & 1\tabularnewline
+Single-operand arithmetic & RRA & integer & 2\tabularnewline
+Single-operand arithmetic & SXTC & integer & 3\tabularnewline
+Single-operand arithmetic & PUSH & integer & 4\tabularnewline
+Single-operand arithmetic & CALL & integer & 5\tabularnewline
+Single-operand arithmetic & RETI & integer & 6\tabularnewline
+Single-operand arithmetic & IRQX & integer & 7\tabularnewline
+Conditional jump & JNE & integer & 0\tabularnewline
+Conditional jump & JEQ & integer & 1\tabularnewline
+Conditional jump & JNC & integer & 2\tabularnewline
+Conditional jump & JC & integer & 3\tabularnewline
+Conditional jump & JN & integer & 4\tabularnewline
+Conditional jump & JGE & integer & 5\tabularnewline
+Conditional jump & JL & integer & 6\tabularnewline
+Conditional jump & JMP & integer & 7\tabularnewline
+Two-operand arithmetic & MOV & integer & 0\tabularnewline
+Two-operand arithmetic & ADD & integer & 1\tabularnewline
+Two-operand arithmetic & ADDC & integer & 2\tabularnewline
+Two-operand arithmetic & SUBC & integer & 3\tabularnewline
+Two-operand arithmetic & SUBB & integer & 4\tabularnewline
+Two-operand arithmetic & CMP & integer & 5\tabularnewline
+Two-operand arithmetic & DADD & integer & 6\tabularnewline
+Two-operand arithmetic & BITC & integer & 7\tabularnewline
+Two-operand arithmetic & BIC & integer & 8\tabularnewline
+Two-operand arithmetic & BIS & integer & 9\tabularnewline
+Two-operand arithmetic & XORX & integer & 10\tabularnewline
+Two-operand arithmetic & ANDX & integer & 11\tabularnewline
+Addressing modes & DIR & integer & 0\tabularnewline
+Addressing modes & IDX & integer & 1\tabularnewline
+Addressing modes & INDIR & integer & 2\tabularnewline
+Addressing modes & INDIR\_I & integer & 3\tabularnewline
+Addressing modes & SYMB & integer & 4\tabularnewline
+Addressing modes & IMM & integer & 5\tabularnewline
+Addressing modes & ABSC & integer & 6\tabularnewline
+Addressing modes & CONST & integer & 7\tabularnewline
+Instruction state machine & I\_IRQ\_FETCH & bit vector &
+000\tabularnewline
+Instruction state machine & I\_IRQ\_DONE & bit vector &
+001\tabularnewline
+Instruction state machine & I\_DEC & bit vector & 010\tabularnewline
+Instruction state machine & I\_EXT1 & bit vector & 011\tabularnewline
+Instruction state machine & I\_EXT2 & bit vector & 100\tabularnewline
+Instruction state machine & I\_IDLE & bit vector & 101\tabularnewline
+Execution state machine & E\_SRC\_AD & bit vector & X5\tabularnewline
+Execution state machine & E\_SRC\_RD & bit vector & X6\tabularnewline
+Execution state machine & E\_SRC\_WR & bit vector & X7\tabularnewline
+Execution state machine & E\_DST\_AD & bit vector & X8\tabularnewline
+Execution state machine & E\_DST\_RD & bit vector & X9\tabularnewline
+Execution state machine & E\_DST\_WR & bit vector & XA\tabularnewline
+Execution state machine & E\_EXEC & bit vector & XB\tabularnewline
+Execution state machine & E\_JUMP & bit vector & XC\tabularnewline
+Execution state machine & E\_IDLE & bit vector & XD\tabularnewline
+Execution state machine & E\_IRQ\_0 & bit vector & X2\tabularnewline
+Execution state machine & E\_IRQ\_1 & bit vector & X1\tabularnewline
+Execution state machine & E\_IRQ\_2 & bit vector & X0\tabularnewline
+Execution state machine & E\_IRQ\_3 & bit vector & X3\tabularnewline
+Execution state machine & E\_IRQ\_4 & bit vector & X4\tabularnewline
+ALU control signals & ALU\_SRC\_INV & integer & 0\tabularnewline
+ALU control signals & ALU\_INC & integer & 1\tabularnewline
+ALU control signals & ALU\_INC\_C & integer & 2\tabularnewline
+ALU control signals & ALU\_ADD & integer & 3\tabularnewline
+ALU control signals & ALU\_AND & integer & 4\tabularnewline
+ALU control signals & ALU\_OR & integer & 5\tabularnewline
+ALU control signals & ALU\_XOR & integer & 6\tabularnewline
+ALU control signals & ALU\_DADD & integer & 7\tabularnewline
+ALU control signals & ALU\_STAT\_7 & integer & 8\tabularnewline
+ALU control signals & ALU\_STAT\_F & integer & 9\tabularnewline
+ALU control signals & ALU\_SHIFT & integer & 10\tabularnewline
+ALU control signals & EXEC\_NO\_WR & integer & 11\tabularnewline
+Debug interface & DBG\_UART\_WR & integer & 18\tabularnewline
+Debug interface & DBG\_UART\_BW & integer & 17\tabularnewline
+Debug interface CPU\_CTL register & HALT & integer & 0\tabularnewline
+Debug interface CPU\_CTL register & RUN & integer & 1\tabularnewline
+Debug interface CPU\_CTL register & ISTEP & integer & 2\tabularnewline
+Debug interface CPU\_CTL register & SW\_BRK\_EN & integer &
+3\tabularnewline
+Debug interface CPU\_CTL register & FRZ\_BRK\_EN & integer &
+4\tabularnewline
+Debug interface CPU\_CTL register & RST\_BRK\_EN & integer &
+5\tabularnewline
+Debug interface CPU\_CTL register & CPU\_RST & integer &
+6\tabularnewline
+Debug interface BRKx\_CTL register & BRK\_MODE\_RD & integer &
+0\tabularnewline
+Debug interface BRKx\_CTL register & BRK\_MODE\_WR & integer &
+1\tabularnewline
+Debug interface BRKx\_CTL register & BRK\_EN & integer &
+2\tabularnewline
+Debug interface BRKx\_CTL register & BRK\_I\_EN & integer &
+3\tabularnewline
+Debug interface BRKx\_CTL register & BRK\_RANGE & integer &
+4\tabularnewline
+Basic clock module: BCSCTL2 Control Register & SELMX & integer &
+7\tabularnewline
+Basic clock module: BCSCTL2 Control Register & SELS & integer &
+3\tabularnewline
+MCLK Clock gate & MCLK\_CGATE & bit & 1\tabularnewline
+SMCLK Clock gate & SMCLK\_CGATE & bit & 1\tabularnewline
+Debug interface: CPU version & CPU\_VERSION & bit vector &
+010\tabularnewline
+Debug interface: Software breakpoint opcode & DBG\_SWBRK\_OP & bit
+vector & X4343\tabularnewline
+UART interface auto data synchronization & DBG\_UART\_AUTO\_SYNC & bit &
+1\tabularnewline
+Counter width for the debug interface UART & DBG\_UART\_XFER\_CNT\_W &
+integer & 16\tabularnewline
+Debug UART interface data rate & DBG\_UART\_BAUD & integer &
+2000000\tabularnewline
+Debug UART interface data rate & DBG\_DCO\_FREQ & integer &
+20000000\tabularnewline
+Debug UART interface data rate & DBG\_UART\_CNT & integer &
+N\tabularnewline
+Debug UART interface data rate & DBG\_UART\_CNTB & bit vector &
+N\tabularnewline
+Debug interface input synchronizer & SYNC\_DBG\_UART\_RXD & bit &
+1\tabularnewline
+MULTIPLIER CONFIGURATION & MPY\_16X16 & bit & 1\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-bus-2}{%
+\subsubsection{2.5.5. Instruction Inputs/Outputs
+Bus}\label{instruction-inputsoutputs-bus-2}}
+
+\hypertarget{data-inputsoutputs-bus-2}{%
+\subsubsection{2.5.6. Data Inputs/Outputs
+Bus}\label{data-inputsoutputs-bus-2}}
+
+\hypertarget{pu-msp430}{%
+\subsection{2.6. PU-MSP430}\label{pu-msp430}}
+
+\hypertarget{definition-5}{%
+\subsubsection{2.6.1. Definition}\label{definition-5}}
+
+The MSP430 implementation has a 16 bit Microarchitecture, 3 stages data
+pipeline and an Instruction Set Architecture based on Reduced
+Instruction Set Computer. Compatible with Wishbone Bus. Only For
+Researching.
+
+A PU cache is a hardware cache used by the PU to reduce the average cost
+(time or energy) to access instruction/data from the main memory. A
+cache is a smaller, faster memory, closer to a core, which stores copies
+of the data from frequently used main memory locations. Most CPUs have
+different independent caches, including instruction and data caches.
+
+\hypertarget{instruction-cache-2}{%
+\subsubsection{2.6.2. Instruction Cache}\label{instruction-cache-2}}
+
+\hypertarget{instruction-organization-2}{%
+\paragraph{2.6.2.1. Instruction
+Organization}\label{instruction-organization-2}}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+Instruction Memory & Module description\tabularnewline
+\midrule
+\endhead
+\texttt{riscv\_imem\_ctrl} & Instruction Memory Access
+Block\tabularnewline
+\texttt{...riscv\_membuf} & Memory Access Buffer\tabularnewline
+\texttt{.....riscv\_ram\_queue} & Fall-through Queue\tabularnewline
+\texttt{...riscv\_memmisaligned} & Misalignment Check\tabularnewline
+\texttt{...riscv\_mmu} & Memory Management Unit\tabularnewline
+\texttt{...riscv\_pmachk} & Physical Memory Attributes
+Checker\tabularnewline
+\texttt{...riscv\_pmpchk} & Physical Memory Protection
+Checker\tabularnewline
+\texttt{...riscv\_icache\_core} & Instruction Cache (Write
+Back)\tabularnewline
+\texttt{.....riscv\_ram\_1rw} & RAM 1RW\tabularnewline
+\texttt{.......riscv\_ram\_1rw\_generic} & RAM 1RW
+Generic\tabularnewline
+\texttt{...riscv\_dext} & Data External Access Logic\tabularnewline
+\texttt{...riscv\_ram\_queue} & Fall-through Queue\tabularnewline
+\texttt{...riscv\_mux} & Bus-Interface-Unit Mux\tabularnewline
+\texttt{riscv\_biu} & Bus Interface Unit\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-amba4-axi-lite-bus-2}{%
+\paragraph{2.6.2.2. Instruction INPUTS/OUTPUTS AMBA4 AXI-Lite
+Bus}\label{instruction-inputsoutputs-amba4-axi-lite-bus-2}}
+
+\hypertarget{signals-of-the-read-and-write-address-channels-4}{%
+\subparagraph{2.6.2.2.1. Signals of the Read and Write Address
+channels}\label{signals-of-the-read-and-write-address-channels-4}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{AWID} & \texttt{ARID} & \texttt{AXI\_ID\_WIDTH} & Output &
+Address ID, to identify multiple streams\tabularnewline
+\texttt{AWADDR} & \texttt{ARADDR} & \texttt{AXI\_ADDR\_WIDTH} & Output &
+Address of the first beat of the burst\tabularnewline
+\texttt{AWLEN} & \texttt{ARLEN} & 8 & Output & Number of beats inside
+the burst\tabularnewline
+\texttt{AWSIZE} & \texttt{ARSIZE} & 3 & Output & Size of each
+beat\tabularnewline
+\texttt{AWBURST} & \texttt{ARBURST} & 2 & Output & Type of the
+burst\tabularnewline
+\texttt{AWLOCK} & \texttt{ARLOCK} & 1 & Output & Lock type, to provide
+atomic operations\tabularnewline
+\texttt{AWCACHE} & \texttt{ARCACHE} & 4 & Output & Memory type, progress
+through the system\tabularnewline
+\texttt{AWPROT} & \texttt{ARPROT} & 3 & Output & Protection
+type\tabularnewline
+\texttt{AWQOS} & \texttt{ARQOS} & 4 & Output & Quality of Service of the
+transaction\tabularnewline
+\texttt{AWREGION} & \texttt{ARREGION} & 4 & Output & Region identifier,
+physical to logical\tabularnewline
+\texttt{AWUSER} & \texttt{ARUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{AWVALID} & \texttt{ARVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{AWREADY} & \texttt{ARREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-read-and-write-data-channels-4}{%
+\subparagraph{2.6.2.2.2. Signals of the Read and Write Data
+channels}\label{signals-of-the-read-and-write-data-channels-4}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{WID} & \texttt{RID} & \texttt{AXI\_ID\_WIDTH} & Output & Data
+ID, to identify multiple streams\tabularnewline
+\texttt{WDATA} & \texttt{RDATA} & \texttt{AXI\_DATA\_WIDTH} & Output &
+Read/Write data\tabularnewline
+\texttt{-\/-} & \texttt{RRESP} & 2 & Output & Read response, current
+RDATA status\tabularnewline
+\texttt{WSTRB} & \texttt{-\/-} & \texttt{AXI\_STRB\_WIDTH} & Output &
+Byte strobe, WDATA signal\tabularnewline
+\texttt{WLAST} & \texttt{RLAST} & 1 & Output & Last beat
+identifier\tabularnewline
+\texttt{WUSER} & \texttt{RUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{WVALID} & \texttt{RVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{WREADY} & \texttt{RREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-write-response-channel-4}{%
+\subparagraph{2.6.2.2.3. Signals of the Write Response
+channel}\label{signals-of-the-write-response-channel-4}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Write Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{BID} & \texttt{AXI\_ID\_WIDTH} & Input & Write response ID, to
+identify multiple streams\tabularnewline
+\texttt{BRESP} & 2 & Input & Write response, to specify the burst
+status\tabularnewline
+\texttt{BUSER} & \texttt{AXI\_USER\_WIDTH} & Input & User-defined
+data\tabularnewline
+\texttt{BVALID} & 1 & Input & xVALID handshake signal\tabularnewline
+\texttt{BREADY} & 1 & Output & xREADY handshake signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-amba3-ahb-lite-bus-2}{%
+\paragraph{2.6.2.3. Instruction INPUTS/OUTPUTS AMBA3 AHB-Lite
+Bus}\label{instruction-inputsoutputs-amba3-ahb-lite-bus-2}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{HRESETn} & 1 & Input & Asynchronous Active Low
+Reset\tabularnewline
+\texttt{HCLK} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{IHSEL} & 1 & Output & Instruction Bus Select\tabularnewline
+\texttt{IHADDR} & \texttt{PLEN} & Output & Instruction Address
+Bus\tabularnewline
+\texttt{IHRDATA} & \texttt{XLEN} & Input & Instruction Read Data
+Bus\tabularnewline
+\texttt{IHWDATA} & \texttt{XLEN} & Output & Instruction Write Data
+Bus\tabularnewline
+\texttt{IHWRITE} & 1 & Output & Instruction Write Select\tabularnewline
+\texttt{IHSIZE} & 3 & Output & Instruction Transfer Size\tabularnewline
+\texttt{IHBURST} & 3 & Output & Instruction Transfer Burst
+Size\tabularnewline
+\texttt{IHPROT} & 4 & Output & Instruction Transfer Protection
+Level\tabularnewline
+\texttt{IHTRANS} & 2 & Output & Instruction Transfer Type\tabularnewline
+\texttt{IHMASTLOCK} & 1 & Output & Instruction Transfer Master
+Lock\tabularnewline
+\texttt{IHREADY} & 1 & Input & Instruction Slave Ready
+Indicator\tabularnewline
+\texttt{IHRESP} & 1 & Input & Instruction Transfer
+Response\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{instruction-inputsoutputs-wishbone-bus-2}{%
+\paragraph{2.6.2.4. Instruction INPUTS/OUTPUTS Wishbone
+Bus}\label{instruction-inputsoutputs-wishbone-bus-2}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{rst} & 1 & Input & Synchronous Active High Reset\tabularnewline
+\texttt{clk} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{iadr} & \texttt{AW} & Input & Instruction Address
+Bus\tabularnewline
+\texttt{idati} & \texttt{DW} & Input & Instruction Input
+Bus\tabularnewline
+\texttt{idato} & \texttt{DW} & Output & Instruction Output
+Bus\tabularnewline
+\texttt{isel} & \texttt{DW/8} & Input & Byte Select
+Signals\tabularnewline
+\texttt{iwe} & 1 & Input & Write Enable Input\tabularnewline
+\texttt{istb} & 1 & Input & Strobe Signal/Core Select
+Input\tabularnewline
+\texttt{icyc} & 1 & Input & Valid Bus Cycle Input\tabularnewline
+\texttt{iack} & 1 & Output & Bus Cycle Acknowledge Output\tabularnewline
+\texttt{ierr} & 1 & Output & Bus Cycle Error Output\tabularnewline
+\texttt{iint} & 1 & Output & Interrupt Signal Output\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-cache-2}{%
+\subsubsection{2.6.3. Data Cache}\label{data-cache-2}}
+
+\hypertarget{data-organization-2}{%
+\paragraph{2.6.3.1. Data Organization}\label{data-organization-2}}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+Data Memory & Module description\tabularnewline
+\midrule
+\endhead
+\texttt{riscv\_dmem\_ctrl} & Data Memory Access Block\tabularnewline
+\texttt{...riscv\_membuf} & Memory Access Buffer\tabularnewline
+\texttt{.....riscv\_ram\_queue} & Fall-through Queue\tabularnewline
+\texttt{...riscv\_memmisaligned} & Misalignment Check\tabularnewline
+\texttt{...riscv\_mmu} & Memory Management Unit\tabularnewline
+\texttt{...riscv\_pmachk} & Physical Memory Attributes
+Checker\tabularnewline
+\texttt{...riscv\_pmpchk} & Physical Memory Protection
+Checker\tabularnewline
+\texttt{...riscv\_dcache\_core} & Data Cache (Write Back)\tabularnewline
+\texttt{.....riscv\_ram\_1rw} & RAM 1RW\tabularnewline
+\texttt{.......riscv\_ram\_1rw\_generic} & RAM 1RW
+Generic\tabularnewline
+\texttt{...riscv\_dext} & Data External Access Logic\tabularnewline
+\texttt{...riscv\_mux} & Bus-Interface-Unit Mux\tabularnewline
+\texttt{riscv\_biu} & Bus Interface Unit\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-inputsoutputs-amba4-axi-lite-bus-2}{%
+\paragraph{2.6.3.2. Data INPUTS/OUTPUTS AMBA4 AXI-Lite
+Bus}\label{data-inputsoutputs-amba4-axi-lite-bus-2}}
+
+\hypertarget{signals-of-the-read-and-write-address-channels-5}{%
+\subparagraph{2.6.3.2.1. Signals of the Read and Write Address
+channels}\label{signals-of-the-read-and-write-address-channels-5}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{AWID} & \texttt{ARID} & \texttt{AXI\_ID\_WIDTH} & Output &
+Address ID, to identify multiple streams\tabularnewline
+\texttt{AWADDR} & \texttt{ARADDR} & \texttt{AXI\_ADDR\_WIDTH} & Output &
+Address of the first beat of the burst\tabularnewline
+\texttt{AWLEN} & \texttt{ARLEN} & 8 & Output & Number of beats inside
+the burst\tabularnewline
+\texttt{AWSIZE} & \texttt{ARSIZE} & 3 & Output & Size of each
+beat\tabularnewline
+\texttt{AWBURST} & \texttt{ARBURST} & 2 & Output & Type of the
+burst\tabularnewline
+\texttt{AWLOCK} & \texttt{ARLOCK} & 1 & Output & Lock type, to provide
+atomic operations\tabularnewline
+\texttt{AWCACHE} & \texttt{ARCACHE} & 4 & Output & Memory type, progress
+through the system\tabularnewline
+\texttt{AWPROT} & \texttt{ARPROT} & 3 & Output & Protection
+type\tabularnewline
+\texttt{AWQOS} & \texttt{ARQOS} & 4 & Output & Quality of Service of the
+transaction\tabularnewline
+\texttt{AWREGION} & \texttt{ARREGION} & 4 & Output & Region identifier,
+physical to logical\tabularnewline
+\texttt{AWUSER} & \texttt{ARUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{AWVALID} & \texttt{ARVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{AWREADY} & \texttt{ARREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-read-and-write-data-channels-5}{%
+\subparagraph{2.6.3.2.2. Signals of the Read and Write Data
+channels}\label{signals-of-the-read-and-write-data-channels-5}}
+
+\begin{longtable}[]{@{}llccl@{}}
+\toprule
+Write Port & Read Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{WID} & \texttt{RID} & \texttt{AXI\_ID\_WIDTH} & Output & Data
+ID, to identify multiple streams\tabularnewline
+\texttt{WDATA} & \texttt{RDATA} & \texttt{AXI\_DATA\_WIDTH} & Output &
+Read/Write data\tabularnewline
+\texttt{-\/-} & \texttt{RRESP} & 2 & Output & Read response, current
+RDATA status\tabularnewline
+\texttt{WSTRB} & \texttt{-\/-} & \texttt{AXI\_STRB\_WIDTH} & Output &
+Byte strobe, WDATA signal\tabularnewline
+\texttt{WLAST} & \texttt{RLAST} & 1 & Output & Last beat
+identifier\tabularnewline
+\texttt{WUSER} & \texttt{RUSER} & \texttt{AXI\_USER\_WIDTH} & Output &
+User-defined data\tabularnewline
+\texttt{WVALID} & \texttt{RVALID} & 1 & Output & xVALID handshake
+signal\tabularnewline
+\texttt{WREADY} & \texttt{RREADY} & 1 & Input & xREADY handshake
+signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{signals-of-the-write-response-channel-5}{%
+\subparagraph{2.6.3.2.3. Signals of the Write Response
+channel}\label{signals-of-the-write-response-channel-5}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Write Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{BID} & \texttt{AXI\_ID\_WIDTH} & Input & Write response ID, to
+identify multiple streams\tabularnewline
+\texttt{BRESP} & 2 & Input & Write response, to specify the burst
+status\tabularnewline
+\texttt{BUSER} & \texttt{AXI\_USER\_WIDTH} & Input & User-defined
+data\tabularnewline
+\texttt{BVALID} & 1 & Input & xVALID handshake signal\tabularnewline
+\texttt{BREADY} & 1 & Output & xREADY handshake signal\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-inputsoutputs-amba3-ahb-lite-bus-2}{%
+\paragraph{2.6.3.3. Data INPUTS/OUTPUTS AMBA3 AHB-Lite
+Bus}\label{data-inputsoutputs-amba3-ahb-lite-bus-2}}
+
+\begin{longtable}[]{@{}lccl@{}}
+\toprule
+Port & Size & Direction & Description\tabularnewline
+\midrule
+\endhead
+\texttt{HRESETn} & 1 & Input & Asynchronous Active Low
+Reset\tabularnewline
+\texttt{HCLK} & 1 & Input & System Clock Input\tabularnewline
+& & &\tabularnewline
+\texttt{DHSEL} & 1 & Output & Data Bus Select\tabularnewline
+\texttt{DHADDR} & \texttt{PLEN} & Output & Data Address
+Bus\tabularnewline
+\texttt{DHRDATA} & \texttt{XLEN} & Input & Data Read Data
+Bus\tabularnewline
+\texttt{DHWDATA} & \texttt{XLEN} & Output & Data Write Data
+Bus\tabularnewline
+\texttt{DHWRITE} & 1 & Output & Data Write Select\tabularnewline
+\texttt{DHSIZE} & 3 & Output & Data Transfer Size\tabularnewline
+\texttt{DHBURST} & 3 & Output & Data Transfer Burst Size\tabularnewline
+\texttt{DHPROT} & 4 & Output & Data Transfer Protection
+Level\tabularnewline
+\texttt{DHTRANS} & 2 & Output & Data Transfer Type\tabularnewline
+\texttt{DHMASTLOCK} & 1 & Output & Data Transfer Master
+Lock\tabularnewline
+\texttt{DHREADY} & 1 & Input & Data Slave Ready Indicator\tabularnewline
+\texttt{DHRESP} & 1 & Input & Data Transfer Response\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{data-inputsoutputs-wishbone-bus-2}{%
+\paragraph{2.6.3.4. Data INPUTS/OUTPUTS Wishbone
+Bus}\label{data-inputsoutputs-wishbone-bus-2}}
 
 \begin{longtable}[]{@{}lccl@{}}
 \toprule

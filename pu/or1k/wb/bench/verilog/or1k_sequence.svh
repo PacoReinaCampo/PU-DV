@@ -39,7 +39,7 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-`include "or1k-defines.sv"
+`include "or1k_defines.sv"
 
 class or1k_transaction extends uvm_sequence_item;
   `uvm_object_utils(or1k_transaction)
