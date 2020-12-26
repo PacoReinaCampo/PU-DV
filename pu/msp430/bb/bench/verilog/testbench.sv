@@ -60,7 +60,7 @@ module test;
   msp430_interface msp430_if();
 
   // Instantiate dut
-  msp430_pu dut (
+  msp430_core dut (
     .dbg_clk           (msp430_if.dbg_clk),
     .dbg_rst           (msp430_if.dbg_rst),
     .irq_detect        (msp430_if.irq_detect),
