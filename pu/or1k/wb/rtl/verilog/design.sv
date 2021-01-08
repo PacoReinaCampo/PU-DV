@@ -196,7 +196,7 @@ interface or1k_interface #(
   logic [                    31:0] snoop_adr_i;
   logic                            snoop_en_i;
   
-  clocking master_cb @(posedge clk);
+  clocking driver_cb @(posedge clk);
     output clk;
     output rst;
 
@@ -261,9 +261,9 @@ interface or1k_interface #(
 
     output snoop_adr_i;
     output snoop_en_i;
-  endclocking : master_cb
+  endclocking : driver_cb
 
-  clocking slave_cb @(posedge clk);
+  clocking monitor_cb @(posedge clk);
     input  clk;
     input  rst;
 
@@ -328,76 +328,8 @@ interface or1k_interface #(
 
     input  snoop_adr_i;
     input  snoop_en_i;
-  endclocking : slave_cb
-  
-  clocking monitor_cb @(posedge clk);
-    input clk;
-    input rst;
-
-    // Wishbone Instruction
-    input iwbm_adr_o;
-    input iwbm_stb_o;
-    input iwbm_cyc_o;
-    input iwbm_sel_o;
-    input iwbm_we_o;
-    input iwbm_cti_o;
-    input iwbm_bte_o;
-    input iwbm_dat_o;
-    input iwbm_err_i;
-    input iwbm_ack_i;
-    input iwbm_dat_i;
-    input iwbm_rty_i;
-
-    // Wishbone Data
-    input dwbm_adr_o;
-    input dwbm_stb_o;
-    input dwbm_cyc_o;
-    input dwbm_sel_o;
-    input dwbm_we_o;
-    input dwbm_cti_o;
-    input dwbm_bte_o;
-    input dwbm_dat_o;
-    input dwbm_err_i;
-    input dwbm_ack_i;
-    input dwbm_dat_i;
-    input dwbm_rty_i;
-
-    input irq_i;
-
-    // Debug interface
-    input du_addr_i;
-    input du_stb_i;
-    input du_dat_i;
-    input du_we_i;
-    input du_dat_o;
-    input du_ack_o;
-
-    // Stall control from debug interface
-    input du_stall_i;
-    input du_stall_o;
-
-    input traceport_exec_valid_o;
-    input traceport_exec_pc_o;
-    input traceport_exec_jb_o;
-    input traceport_exec_jal_o;
-    input traceport_exec_jr_o;
-    input traceport_exec_jbtarget_o;
-    input traceport_exec_insn_o;
-    input traceport_exec_wbdata_o;
-    input traceport_exec_wbreg_o;
-    input traceport_exec_wben_o;
-
-    // The multicore core identifier
-    input multicore_coreid_i;
-
-    // The number of cores
-    input multicore_numcores_i;
-
-    input snoop_adr_i;
-    input snoop_en_i;
   endclocking : monitor_cb
 
-  modport master(clocking master_cb);
-  modport slave(clocking slave_cb);
-  modport passive(clocking monitor_cb);
+  modport driver_if_mp(clocking driver_cb);
+  modport monitor_if_mp(clocking monitor_cb);
 endinterface

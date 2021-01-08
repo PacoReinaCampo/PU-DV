@@ -66,8 +66,8 @@ module test;
     .irq_detect        (msp430_if.irq_detect),
     .nmi_detect        (msp430_if.nmi_detect),
 
-    .i_state           (msp430_if.i_state_bin),
-    .e_state           (msp430_if.e_state_bin),
+    .i_state           (msp430_if.i_state),
+    .e_state           (msp430_if.e_state),
     .decode            (msp430_if.decode),
     .ir                (msp430_if.ir),
     .irq_num           (msp430_if.irq_num),
@@ -78,7 +78,7 @@ module test;
     .aclk              (msp430_if.aclk),              // ASIC ONLY: ACLK
     .aclk_en           (msp430_if.aclk_en),           // FPGA ONLY: ACLK enable
     .dbg_freeze        (msp430_if.dbg_freeze),        // Freeze peripherals
-    .dbg_i2c_sda_out   (msp430_if.dbg_sda_slave_out), // Debug interface: I2C SDA OUT
+    .dbg_i2c_sda_out   (msp430_if.dbg_i2c_sda_out),   // Debug interface: I2C SDA OUT
     .dbg_uart_txd      (msp430_if.dbg_uart_txd),      // Debug interface: UART TXD
     .dco_enable        (msp430_if.dco_enable),        // ASIC ONLY: Fast oscillator enable
     .dco_wkup          (msp430_if.dco_wkup),          // ASIC ONLY: Fast oscillator wake-up (asynchronous)
@@ -105,14 +105,14 @@ module test;
     // INPUTs
     .cpu_en            (msp430_if.cpu_en),            // Enable CPU code execution (asynchronous)
     .dbg_en            (msp430_if.dbg_en),            // Debug interface enable (asynchronous)
-    .dbg_i2c_addr      (msp430_if.I2C_ADDR),          // Debug interface: I2C Address
-    .dbg_i2c_broadcast (msp430_if.I2C_BROADCAST),     // Debug interface: I2C Broadcast Address (for multicore systems)
-    .dbg_i2c_scl       (msp430_if.dbg_scl_slave),     // Debug interface: I2C SCL
-    .dbg_i2c_sda_in    (msp430_if.dbg_sda_slave_in),  // Debug interface: I2C SDA IN
+    .dbg_i2c_addr      (msp430_if.dbg_i2c_addr),      // Debug interface: I2C Address
+    .dbg_i2c_broadcast (msp430_if.dbg_i2c_broadcast), // Debug interface: I2C Broadcast Address (for multicore systems)
+    .dbg_i2c_scl       (msp430_if.dbg_i2c_scl),       // Debug interface: I2C SCL
+    .dbg_i2c_sda_in    (msp430_if.dbg_i2c_sda_in),    // Debug interface: I2C SDA IN
     .dbg_uart_rxd      (msp430_if.dbg_uart_rxd),      // Debug interface: UART RXD (asynchronous)
     .dco_clk           (msp430_if.dco_clk),           // Fast oscillator (fast clock)
     .dmem_dout         (msp430_if.dmem_dout),         // Data Memory data output
-    .irq               (msp430_if.irq_in),            // Maskable interrupts
+    .irq               (msp430_if.irq),               // Maskable interrupts
     .lfxt_clk          (msp430_if.lfxt_clk),          // Low frequency oscillator (typ 32kHz)
     .nmi               (msp430_if.nmi),               // Non-maskable interrupt (asynchronous)
     .per_dout          (msp430_if.per_dout),          // Peripheral data output
@@ -120,7 +120,7 @@ module test;
     .reset_n           (msp430_if.reset_n),           // Reset Pin (low active, asynchronous)
     .scan_enable       (msp430_if.scan_enable),       // ASIC ONLY: Scan enable (active during scan shifting)
     .scan_mode         (msp430_if.scan_mode),         // ASIC ONLY: Scan mode
-    .wkup              (|msp430_if.wkup_in),          // ASIC ONLY: System Wake-up (asynchronous)
+    .wkup              (|msp430_if.wkup),             // ASIC ONLY: System Wake-up (asynchronous)
 
     .r0                (msp430_if.r0),
     .r1                (msp430_if.r1),

@@ -74,7 +74,7 @@ class riscv_monitor extends uvm_monitor;
     count = 0;
     fork
       forever begin
-        @(riscv_vif.monitor_if_mp.monitor_cb.inst_out) begin
+        @(riscv_vif.monitor_if_mp.monitor_cb.ins_HRDATA) begin
           if(count<17) begin
             count++;
           end

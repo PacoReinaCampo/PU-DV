@@ -130,7 +130,7 @@ interface msp430_interface #(
   logic [DW    -1:0] r14;
   logic [DW    -1:0] r15;
   
-  clocking master_cb @(posedge dbg_clk);
+  clocking driver_cb @(posedge dbg_clk);
     output dbg_clk;
     output dbg_rst;
     output irq_detect;
@@ -211,9 +211,9 @@ interface msp430_interface #(
     output r13;
     output r14;
     output r15;
-  endclocking : master_cb
+  endclocking : driver_cb
 
-  clocking slave_cb @(posedge dbg_clk);
+  clocking monitor_cb @(posedge dbg_clk);
     input  dbg_clk;
     input  dbg_rst;
     input  irq_detect;
@@ -294,92 +294,8 @@ interface msp430_interface #(
     input  r13;
     input  r14;
     input  r15;
-  endclocking : slave_cb
-  
-  clocking monitor_cb @(posedge dbg_clk);
-    input dbg_clk;
-    input dbg_rst;
-    input irq_detect;
-    input nmi_detect;
-
-    input i_state;
-    input e_state;
-    input decode;
-    input ir;
-    input irq_num;
-    input pc;
-
-    input nodiv_smclk;
-
-    input aclk;              // ASIC ONLY: ACLK
-    input aclk_en;           // FPGA ONLY: ACLK enable
-    input dbg_freeze;        // Freeze peripherals
-    input dbg_i2c_sda_out;   // Debug interface: I2C SDA OUT
-    input dbg_uart_txd;      // Debug interface: UART TXD
-    input dco_enable;        // ASIC ONLY: Fast oscillator enable
-    input dco_wkup;          // ASIC ONLY: Fast oscillator wake-up (asynchronous)
-    input irq_acc;           // Interrupt request accepted (one-hot signal)
-    input lfxt_enable;       // ASIC ONLY: Low frequency oscillator enable
-    input lfxt_wkup;         // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
-    input mclk;              // Main system clock
-    input puc_rst;           // Main system reset
-    input smclk;             // ASIC ONLY: SMCLK
-    input smclk_en;          // FPGA ONLY: SMCLK enable
-
-    input cpu_en;            // Enable CPU code execution (asynchronous and non-glitchy)
-    input dbg_en;            // Debug interface enable (asynchronous and non-glitchy)
-    input dbg_i2c_addr;      // Debug interface: I2C Address
-    input dbg_i2c_broadcast; // Debug interface: I2C Broadcast Address (for multicore systems)
-    input dbg_i2c_scl;       // Debug interface: I2C SCL
-    input dbg_i2c_sda_in;    // Debug interface: I2C SDA IN
-    input dbg_uart_rxd;      // Debug interface: UART RXD (asynchronous)
-    input dco_clk;           // Fast oscillator (fast clock)
-    input irq;               // Maskable interrupts (14; 30 or 62)
-    input lfxt_clk;          // Low frequency oscillator (typ 32kHz)
-    input nmi;               // Non-maskable interrupt (asynchronous and non-glitchy)
-    input reset_n;           // Reset Pin (active low; asynchronous and non-glitchy)
-    input scan_enable;       // ASIC ONLY: Scan enable (active during scan shifting)
-    input scan_mode;         // ASIC ONLY: Scan mode
-    input wkup;              // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
-
-    input pmem_addr;         // Program Memory address
-    input pmem_cen;          // Program Memory chip enable (low active)
-    input pmem_din;          // Program Memory data input (optional)
-    input pmem_wen;          // Program Memory write enable (low active) (optional)
-    input pmem_dout;         // Program Memory data output
-
-
-    input dmem_addr;         // Data Memory address
-    input dmem_cen;          // Data Memory chip enable (low active)
-    input dmem_din;          // Data Memory data input
-    input dmem_wen;          // Data Memory write enable (low active)
-    input dmem_dout;         // Data Memory data output
-
-    input per_addr;          // Peripheral address
-    input per_din;           // Peripheral data input
-    input per_we;            // Peripheral write enable (high active)
-    input per_en;            // Peripheral enable (high active)
-    input per_dout;          // Peripheral data output
-
-    input r0;
-    input r1;
-    input r2;
-    input r3;
-    input r4;
-    input r5;
-    input r6;
-    input r7;
-    input r8;
-    input r9;
-    input r10;
-    input r11;
-    input r12;
-    input r13;
-    input r14;
-    input r15;
   endclocking : monitor_cb
 
-  modport master(clocking master_cb);
-  modport slave(clocking slave_cb);
-  modport passive(clocking monitor_cb);
+  modport driver_if_mp(clocking driver_cb);
+  modport monitor_if_mp(clocking monitor_cb);
 endinterface

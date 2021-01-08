@@ -147,7 +147,7 @@ interface riscv_interface #(
   logic                         dbg_ack;
   logic                         dbg_bp;
   
-  clocking master_cb @(posedge clk);
+  clocking driver_cb @(posedge clk);
     output clk;
     output rst;
 
@@ -197,9 +197,9 @@ interface riscv_interface #(
     input  dbg_dato;
     input  dbg_ack;
     input  dbg_bp;
-  endclocking : master_cb
+  endclocking : driver_cb
 
-  clocking slave_cb @(posedge clk);
+  clocking monitor_cb @(posedge clk);
     input  clk;
     input  rst;
 
@@ -249,61 +249,8 @@ interface riscv_interface #(
     output dbg_dato;
     output dbg_ack;
     output dbg_bp;
-  endclocking : slave_cb
-  
-  clocking monitor_cb @(posedge clk);
-    input clk;
-    input rst;
-
-    input pma_cfg_i;
-    input pma_adr_i;
-
-    // AHB3 instruction
-    input ins_HSEL;
-    input ins_HADDR;
-    input ins_HWDATA;
-    input ins_HRDATA;
-    input ins_HWRITE;
-    input ins_HSIZE;
-    input ins_HBURST;
-    input ins_HPROT;
-    input ins_HTRANS;
-    input ins_HMASTLOCK;
-    input ins_HREADY;
-    input ins_HRESP;
-
-    // AHB3 data
-    input dat_HSEL;
-    input dat_HADDR;
-    input dat_HWDATA;
-    input dat_HRDATA;
-    input dat_HWRITE;
-    input dat_HSIZE;
-    input dat_HBURST;
-    input dat_HPROT;
-    input dat_HTRANS;
-    input dat_HMASTLOCK;
-    input dat_HREADY;
-    input dat_HRESP;
-
-    // Interrupts
-    input ext_nmi;
-    input ext_tint;
-    input ext_sint;
-    input ext_int;
-
-    // Debug Interface
-    input dbg_stall;
-    input dbg_strb;
-    input dbg_we;
-    input dbg_addr;
-    input dbg_dati;
-    input dbg_dato;
-    input dbg_ack;
-    input dbg_bp;
   endclocking : monitor_cb
 
-  modport master(clocking master_cb);
-  modport slave(clocking slave_cb);
-  modport passive(clocking monitor_cb);
+  modport driver_if_mp(clocking driver_cb);
+  modport monitor_if_mp(clocking monitor_cb);
 endinterface
