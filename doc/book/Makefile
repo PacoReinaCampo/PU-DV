@@ -9,7 +9,7 @@
 ##                  |_|                                                          ##
 ##                                                                               ##
 ##                                                                               ##
-##              PU-NTM (T-DNC/NTM-PU)                                            ##
+##              PU-DV                                                            ##
 ##              QueenField                                                       ##
 ##                                                                               ##
 ###################################################################################
@@ -52,11 +52,12 @@ EXPORTED_DOCS=\
  $(SOURCE_DOCS:.md=.odt)  \
  $(SOURCE_DOCS:.md=.epub)
 
-PANDOC_OPTIONS=-f markdown       \
     --table-of-contents          \
+    --toc-depth=6                \
     --number-sections            \
     --pdf-engine=xelatex         \
-    --highlight-style=monochrome \
+    -V lof=yes                   \
+    -V lot=yes                   \
     -V fontsize="10pt"           \
     -V documentclass=report      \
     -V papersize=A4              \
