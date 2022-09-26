@@ -52,6 +52,7 @@ EXPORTED_DOCS=\
  $(SOURCE_DOCS:.md=.odt)  \
  $(SOURCE_DOCS:.md=.epub)
 
+PANDOC_OPTIONS=-f markdown       \
     --table-of-contents          \
     --toc-depth=6                \
     --number-sections            \
