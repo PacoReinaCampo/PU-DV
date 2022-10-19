@@ -1,6 +1,6 @@
 ---
 title: 'PU-DV'
-subtitle: 'QueenField ![](../../icon.jpg)'
+subtitle: 'QueenField ![](../../pu-dv.svg){width=17cm}'
 
 author: Paco Reina Campo
 
