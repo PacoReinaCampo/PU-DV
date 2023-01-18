@@ -7,9 +7,3 @@
 [submodule "pu-riscv"]
 	path = pu-riscv
 	url = https://github.com/PacoReinaCampo/PU-RISCV.git
-[submodule "uvm"]
-	path = uvm
-	url = https://github.com/PacoReinaCampo/UVM.git
-[submodule "osvvm"]
-	path = osvvm
-	url = https://github.com/PacoReinaCampo/OSVVM.git
