@@ -33,4 +33,4 @@
 ../../../../../../pu-msp430/rtl/verilog/core/main/msp430_ta.sv
 ../../../../../../pu-msp430/rtl/verilog/core/main/msp430_watchdog.sv
 
-../../../../../../pu-msp430/rtl/verilog/pu/msp430_core.sv
+../../../../../../pu-msp430/rtl/verilog/pu/msp430_pu.sv

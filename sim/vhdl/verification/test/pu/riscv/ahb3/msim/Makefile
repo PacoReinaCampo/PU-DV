@@ -8,7 +8,4 @@ simulate:
 	vsim -c -do run.do work.testbench
 
 clean:
-	rm -rf work
-
-clean:
 	rm -rf work transcript
