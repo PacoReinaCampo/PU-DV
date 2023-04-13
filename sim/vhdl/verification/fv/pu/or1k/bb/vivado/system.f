@@ -42,16 +42,16 @@
 //                                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
 
--i ../../../../../../../../pu/or1k/library/bb
+-i ../../../../../../../../pu/or1k/uvm/library/bb
 
-../../../../../../../../pu/or1k/application/bb/peripheral_adder.sv
-../../../../../../../../pu/or1k/application/bb/peripheral_full_adder.sv
-../../../../../../../../pu/or1k/application/bb/peripheral_half_adder.sv
+../../../../../../../../pu/or1k/uvm/application/bb/peripheral_adder.sv
+../../../../../../../../pu/or1k/uvm/application/bb/peripheral_full_adder.sv
+../../../../../../../../pu/or1k/uvm/application/bb/peripheral_half_adder.sv
 
-../../../../../../../../pu/or1k/pkg/bb/peripheral_uvm_agent_pkg.sv
-../../../../../../../../pu/or1k/pkg/bb/peripheral_uvm_reference_model_pkg.sv
-../../../../../../../../pu/or1k/pkg/bb/peripheral_uvm_environment_pkg.sv
-../../../../../../../../pu/or1k/pkg/bb/peripheral_uvm_sequence_pkg.sv
-../../../../../../../../pu/or1k/pkg/bb/peripheral_uvm_test_pkg.sv
+../../../../../../../../pu/or1k/uvm/pkg/bb/peripheral_uvm_agent_pkg.sv
+../../../../../../../../pu/or1k/uvm/pkg/bb/peripheral_uvm_reference_model_pkg.sv
+../../../../../../../../pu/or1k/uvm/pkg/bb/peripheral_uvm_environment_pkg.sv
+../../../../../../../../pu/or1k/uvm/pkg/bb/peripheral_uvm_sequence_pkg.sv
+../../../../../../../../pu/or1k/uvm/pkg/bb/peripheral_uvm_test_pkg.sv
 
-../../../../../../../../pu/or1k/library/bb/peripheral_uvm_testbench.sv
+../../../../../../../../pu/or1k/uvm/library/bb/peripheral_uvm_testbench.sv
