@@ -40,7 +40,48 @@ application
 │       ├── include-arithmetic.txt
 │       ├── main.c
 │       └── simulate-riscv.sh
-└── core
+├── core
+│   ├── ahb3
+│   │   ├── build-or1k.sh
+│   │   ├── build-riscv.sh
+│   │   ├── build-x86.sh
+│   │   ├── clean.sh
+│   │   ├── include-arithmetic.txt
+│   │   ├── main.c
+│   │   └── simulate-riscv.sh
+│   ├── apb4
+│   │   ├── build-or1k.sh
+│   │   ├── build-riscv.sh
+│   │   ├── build-x86.sh
+│   │   ├── clean.sh
+│   │   ├── include-arithmetic.txt
+│   │   ├── main.c
+│   │   └── simulate-riscv.sh
+│   ├── axi4
+│   │   ├── build-or1k.sh
+│   │   ├── build-riscv.sh
+│   │   ├── build-x86.sh
+│   │   ├── clean.sh
+│   │   ├── include-arithmetic.txt
+│   │   ├── main.c
+│   │   └── simulate-riscv.sh
+│   ├── bb
+│   │   ├── build-or1k.sh
+│   │   ├── build-riscv.sh
+│   │   ├── build-x86.sh
+│   │   ├── clean.sh
+│   │   ├── include-arithmetic.txt
+│   │   ├── main.c
+│   │   └── simulate-riscv.sh
+│   └── wb
+│       ├── build-or1k.sh
+│       ├── build-riscv.sh
+│       ├── build-x86.sh
+│       ├── clean.sh
+│       ├── include-arithmetic.txt
+│       ├── main.c
+│       └── simulate-riscv.sh
+└── pu
     ├── ahb3
     │   ├── build-or1k.sh
     │   ├── build-riscv.sh
@@ -82,4 +123,4 @@ application
         ├── main.c
         └── simulate-riscv.sh
 
-12 directories, 70 files
+18 directories, 105 files
