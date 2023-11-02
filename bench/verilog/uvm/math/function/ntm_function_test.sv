@@ -42,7 +42,7 @@
  */
 
 class ntm_intro_test extends uvm_test;
-  //Register with factory
+  // Register with factory
   `uvm_component_utils(ntm_intro_test);
 
   ntm_intro_env env;
@@ -52,8 +52,8 @@ class ntm_intro_test extends uvm_test;
     super.new(name, parent);
   endfunction
 
-  //Build phase - Construct the env class using factory
-  //Get the virtual interface handle from Test and then set it config db for the env component
+  // Build phase - Construct the env class using factory
+  // Get the virtual interface handle from Test and then set it config db for the env component
   function void build_phase(uvm_phase phase);
     env = ntm_intro_env::type_id::create("env", this);
 
@@ -63,7 +63,7 @@ class ntm_intro_test extends uvm_test;
     uvm_config_db#(virtual dut_if)::set( this, "env", "vif", vif);
   endfunction
 
-  //Run phase - Create an ntm_intro_sequence and start it on the ntm_intro_sequencer
+  // Run phase - Create an ntm_intro_sequence and start it on the ntm_intro_sequencer
   task run_phase( uvm_phase phase );
     ntm_intro_sequence ntm_intro_seq;
     ntm_intro_seq = ntm_intro_sequence::type_id::create("ntm_intro_seq");

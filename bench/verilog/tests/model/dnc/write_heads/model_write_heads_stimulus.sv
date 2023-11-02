@@ -76,7 +76,7 @@ module model_write_heads_stimulus #(
   output [DATA_SIZE-1:0] NTM_ERASE_VECTOR_E_IN,
   input NTM_ERASE_VECTOR_E_OUT,
 
-  //WRITE GATE
+  // WRITE GATE
   // CONTROL
   output NTM_WRITE_GATE_START,
   input NTM_WRITE_GATE_READY,

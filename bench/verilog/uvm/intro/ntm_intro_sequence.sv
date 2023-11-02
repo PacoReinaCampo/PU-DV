@@ -50,7 +50,7 @@ class ntm_intro_sequence extends uvm_sequence#(ntm_intro_transaction);
 
   task body();
     ntm_intro_transaction rw_trans;
-    //create 10 random INTRO read/write transaction and send to driver
+    // create 10 random INTRO read/write transaction and send to driver
     repeat (80) begin
       rw_trans=new();
       start_item(rw_trans);

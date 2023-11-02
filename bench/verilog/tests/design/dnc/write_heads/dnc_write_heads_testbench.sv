@@ -168,7 +168,7 @@ module dnc_write_heads_testbench;
     .NTM_ERASE_VECTOR_E_IN(e_in_erase_vector),
     .NTM_ERASE_VECTOR_E_OUT(e_out_erase_vector),
 
-    //WRITE GATE
+    // WRITE GATE
     // CONTROL
     .NTM_WRITE_GATE_START(start_write_gate),
     .NTM_WRITE_GATE_READY(ready_write_gate),

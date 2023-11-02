@@ -66,16 +66,16 @@ class ntm_intro_driver extends uvm_driver#(ntm_intro_transaction);
     forever begin
       ntm_intro_transaction tr;
       @ (this.vif.master_cb);
-      //First get an item from sequencer
+      // First get an item from sequencer
       seq_item_port.get_next_item(tr);
       @ (this.vif.master_cb);
       uvm_report_info("INTRO_DRIVER ", $sformatf("Got Transaction %s",tr.convert2string()));
-      //Decode the INTRO Command and call either the read/write function
+      // Decode the INTRO Command and call either the read/write function
       case (tr.pwrite)
         ntm_intro_transaction::READ:  drive_read(tr.addr, tr.data);  
         ntm_intro_transaction::WRITE: drive_write(tr.addr, tr.data);
       endcase
-      //Handshake DONE back to sequencer
+      // Handshake DONE back to sequencer
       seq_item_port.item_done();
     end
   endtask

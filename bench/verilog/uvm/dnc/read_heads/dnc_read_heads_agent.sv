@@ -42,7 +42,7 @@
  */
 
 class ntm_intro_agent extends uvm_agent;
-  //Agent will have the sequencer, driver and monitor components for the INTRO interface
+  // Agent will have the sequencer, driver and monitor components for the INTRO interface
   ntm_intro_sequencer sqr;
   ntm_intro_driver drv;
   ntm_intro_monitor mon;
@@ -59,9 +59,9 @@ class ntm_intro_agent extends uvm_agent;
     super.new(name, parent);
   endfunction
 
-  //Build phase of agent - construct sequencer, driver and monitor
-  //get handle to virtual interface from env (parent) config_db
-  //and pass handle down to srq/driver/monitor
+  // Build phase of agent - construct sequencer, driver and monitor
+  // get handle to virtual interface from env (parent) config_db
+  // and pass handle down to srq/driver/monitor
   virtual function void build_phase(uvm_phase phase);
     sqr = ntm_intro_sequencer::type_id::create("sqr", this);
     drv = ntm_intro_driver::type_id::create("drv", this);
@@ -75,7 +75,7 @@ class ntm_intro_agent extends uvm_agent;
     uvm_config_db#(virtual dut_if)::set( this, "mon", "vif", vif);
   endfunction
 
-  //Connect - driver and sequencer port to export
+  // Connect - driver and sequencer port to export
   virtual function void connect_phase(uvm_phase phase);
     drv.seq_item_port.connect(sqr.seq_item_export);
     uvm_report_info("INTRO_AGENT", "connect_phase, Connected driver to sequencer");

@@ -44,20 +44,20 @@
 class ntm_intro_env extends uvm_env;
   `uvm_component_utils(ntm_intro_env);
 
-  //ENV class will have agent as its sub component
+  // ENV class will have agent as its sub component
   ntm_intro_agent agt;
   ntm_intro_scoreboard scb;
   ntm_intro_subscriber ntm_intro_subscriber_h;
 
-  //virtual interface for INTRO interface
+  // virtual interface for INTRO interface
   virtual dut_if vif;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
   endfunction
 
-  //Build phase
-  //Construct agent and get virtual interface handle from test and pass it down to agent
+  // Build phase
+  // Construct agent and get virtual interface handle from test and pass it down to agent
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     agt = ntm_intro_agent::type_id::create("agt", this);

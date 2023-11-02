@@ -62,12 +62,12 @@ class ntm_intro_scoreboard extends uvm_scoreboard;
   
   // write task - recives the pkt from monitor and pushes into queue
   function void write(ntm_intro_transaction tr);
-    //tr.print();
+    // tr.print();
     exp_queue.push_back(tr);
   endfunction 
   
   virtual task run_phase(uvm_phase phase);
-    //super.run_phase(phase);
+    // super.run_phase(phase);
     ntm_intro_transaction expdata;
     
     forever begin

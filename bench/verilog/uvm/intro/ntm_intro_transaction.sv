@@ -44,13 +44,13 @@
 class ntm_intro_transaction extends uvm_sequence_item;
   `uvm_object_utils(ntm_intro_transaction)
 
-  //typedef for READ/WRITE transaction type
+  // typedef for READ/WRITE transaction type
   typedef enum {READ, WRITE} kind_e;
 
-  rand bit [31:0] addr;  //Address
-  rand bit [31:0] data;  //Data - For write or read response
+  rand bit [31:0] addr;  // Address
+  rand bit [31:0] data;  // Data - For write or read response
 
-  rand kind_e pwrite;  //command type
+  rand kind_e pwrite;  // command type
 
   constraint c1{addr[31:0]>=32'd0; addr[31:0] <32'd256;};
   constraint c2{data[31:0]>=32'd0; data[31:0] <32'd256;};

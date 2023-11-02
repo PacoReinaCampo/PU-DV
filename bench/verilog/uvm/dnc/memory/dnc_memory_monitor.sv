@@ -44,8 +44,8 @@
 class ntm_intro_monitor extends uvm_monitor;
   virtual dut_if vif;
 
-  //Analysis port -parameterized to ntm_intro_rw transaction
-  ///Monitor writes transaction objects to this port once detected on interface
+  // Analysis port -parameterized to ntm_intro_rw transaction
+  /// Monitor writes transaction objects to this port once detected on interface
   uvm_analysis_port#(ntm_intro_transaction) ap;
 
   `uvm_component_utils(ntm_intro_monitor)
@@ -55,7 +55,7 @@ class ntm_intro_monitor extends uvm_monitor;
     ap = new("ap", this);
   endfunction
 
-  //Build Phase - Get handle to virtual if from agent/config_db
+  // Build Phase - Get handle to virtual if from agent/config_db
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     if (!uvm_config_db#(virtual dut_if)::get(this, "", "vif", vif)) begin
@@ -72,10 +72,10 @@ class ntm_intro_monitor extends uvm_monitor;
         @ (this.vif.monitor_cb);
       end
       while (this.vif.monitor_cb.psel !== 1'b1 || this.vif.monitor_cb.penable !== 1'b0);
-      //create a transaction object
+      // create a transaction object
       tr = ntm_intro_transaction::type_id::create("tr", this);
 
-      //populate fields based on values seen on interface
+      // populate fields based on values seen on interface
       tr.pwrite = (this.vif.monitor_cb.pwrite) ? ntm_intro_transaction::WRITE : ntm_intro_transaction::READ;
       tr.addr = this.vif.monitor_cb.paddr;
 
@@ -92,7 +92,7 @@ class ntm_intro_monitor extends uvm_monitor;
       end
 
       uvm_report_info("INTRO_MONITOR", $sformatf("Got Transaction %s",tr.convert2string()));
-      //Write to analysis port
+      // Write to analysis port
       ap.write(tr);
     end
   endtask

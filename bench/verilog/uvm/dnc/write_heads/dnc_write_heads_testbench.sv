@@ -41,12 +41,12 @@
  *   Paco Reina Campo <pacoreinacampo@queenfield.tech>
  */
 
-//Include UVM files
+// Include UVM files
 `include "uvm_macros.svh"
 `include "uvm_pkg.sv"
 import uvm_pkg::*;
 
-//Include common files
+// Include common files
 `include "ntm_intro_transaction.sv"
 `include "ntm_intro_sequence.sv"
 `include "ntm_intro_sequencer.sv"
@@ -76,7 +76,7 @@ module test;
     ntm_intro_if.pclk=0;
   end
 
-  //Generate a clock
+  // Generate a clock
   always begin
     #10 ntm_intro_if.pclk = ~ntm_intro_if.pclk;
   end
