@@ -31,7 +31,39 @@ application
 │   └── wb
 │       ├── peripheral_test.adb
 │       └── peripheral_test.ads
-└── pu
+├── mpsoc
+│   ├── ahb3
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── apb4
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── axi4
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── bb
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   └── wb
+│       ├── peripheral_test.adb
+│       └── peripheral_test.ads
+├── pu
+│   ├── ahb3
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── apb4
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── axi4
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   ├── bb
+│   │   ├── peripheral_test.adb
+│   │   └── peripheral_test.ads
+│   └── wb
+│       ├── peripheral_test.adb
+│       └── peripheral_test.ads
+└── soc
     ├── ahb3
     │   ├── peripheral_test.adb
     │   └── peripheral_test.ads
@@ -48,4 +80,4 @@ application
         ├── peripheral_test.adb
         └── peripheral_test.ads
 
-18 directories, 30 files
+30 directories, 50 files
