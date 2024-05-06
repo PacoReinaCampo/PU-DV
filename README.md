@@ -1,6 +1,6 @@
 # PU-DV
 ## QueenField
 
-![QueenField](../master/icon.jpg)
+![QueenField](../main/icon.jpg)
 
 **Processing Unit verified with UVM/OSVVM/FV**
