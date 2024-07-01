@@ -25,33 +25,7 @@ application
 │   │   └── peripheral_test.adb
 │   └── wb
 │       └── peripheral_test.adb
-├── mpsoc
-│   ├── ahb3
-│   │   └── peripheral_test.adb
-│   ├── apb4
-│   │   └── peripheral_test.adb
-│   ├── axi4
-│   │   └── peripheral_test.adb
-│   ├── bb
-│   │   └── peripheral_test.adb
-│   ├── biu
-│   │   └── peripheral_test.adb
-│   └── wb
-│       └── peripheral_test.adb
-├── pu
-│   ├── ahb3
-│   │   └── peripheral_test.adb
-│   ├── apb4
-│   │   └── peripheral_test.adb
-│   ├── axi4
-│   │   └── peripheral_test.adb
-│   ├── bb
-│   │   └── peripheral_test.adb
-│   ├── biu
-│   │   └── peripheral_test.adb
-│   └── wb
-│       └── peripheral_test.adb
-└── soc
+└── pu
     ├── ahb3
     │   └── peripheral_test.adb
     ├── apb4
@@ -65,4 +39,4 @@ application
     └── wb
         └── peripheral_test.adb
 
-35 directories, 30 files
+21 directories, 18 files

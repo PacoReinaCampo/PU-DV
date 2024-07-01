@@ -37,45 +37,7 @@ application
 │   └── wb
 │       └── src
 │           └── main.rs
-├── mpsoc
-│   ├── ahb3
-│   │   └── src
-│   │       └── main.rs
-│   ├── apb4
-│   │   └── src
-│   │       └── main.rs
-│   ├── axi4
-│   │   └── src
-│   │       └── main.rs
-│   ├── bb
-│   │   └── src
-│   │       └── main.rs
-│   ├── biu
-│   │   └── src
-│   │       └── main.rs
-│   └── wb
-│       └── src
-│           └── main.rs
-├── pu
-│   ├── ahb3
-│   │   └── src
-│   │       └── main.rs
-│   ├── apb4
-│   │   └── src
-│   │       └── main.rs
-│   ├── axi4
-│   │   └── src
-│   │       └── main.rs
-│   ├── bb
-│   │   └── src
-│   │       └── main.rs
-│   ├── biu
-│   │   └── src
-│   │       └── main.rs
-│   └── wb
-│       └── src
-│           └── main.rs
-└── soc
+└── pu
     ├── ahb3
     │   └── src
     │       └── main.rs
@@ -95,4 +57,4 @@ application
         └── src
             └── main.rs
 
-65 directories, 30 files
+39 directories, 18 files

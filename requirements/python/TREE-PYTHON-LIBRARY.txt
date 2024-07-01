@@ -25,33 +25,7 @@ library
 │   │   └── peripheral_design.py
 │   └── wb
 │       └── peripheral_design.py
-├── mpsoc
-│   ├── ahb3
-│   │   └── peripheral_design.py
-│   ├── apb4
-│   │   └── peripheral_design.py
-│   ├── axi4
-│   │   └── peripheral_design.py
-│   ├── bb
-│   │   └── peripheral_design.py
-│   ├── biu
-│   │   └── peripheral_design.py
-│   └── wb
-│       └── peripheral_design.py
-├── pu
-│   ├── ahb3
-│   │   └── peripheral_design.py
-│   ├── apb4
-│   │   └── peripheral_design.py
-│   ├── axi4
-│   │   └── peripheral_design.py
-│   ├── bb
-│   │   └── peripheral_design.py
-│   ├── biu
-│   │   └── peripheral_design.py
-│   └── wb
-│       └── peripheral_design.py
-└── soc
+└── pu
     ├── ahb3
     │   └── peripheral_design.py
     ├── apb4
@@ -65,4 +39,4 @@ library
     └── wb
         └── peripheral_design.py
 
-35 directories, 30 files
+21 directories, 18 files
