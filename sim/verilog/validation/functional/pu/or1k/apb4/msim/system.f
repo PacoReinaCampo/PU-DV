@@ -42,10 +42,10 @@
 ##                                                                               ##
 ###################################################################################
 
-../../../../../../../../mpsoc/functional/or1k/osvvm/application/apb4/peripheral_osvvm_design.vhd
-../../../../../../../../mpsoc/functional/or1k/osvvm/application/apb4/peripheral_osvvm_design_pkg.vhd
+../../../../../../../../pu/functional/or1k/osvvm/application/apb4/peripheral_osvvm_design.vhd
+../../../../../../../../pu/functional/or1k/osvvm/application/apb4/peripheral_osvvm_design_pkg.vhd
 
-../../../../../../../../mpsoc/functional/or1k/osvvm/library/apb4/peripheral_osvvm_model.vhd
-../../../../../../../../mpsoc/functional/or1k/osvvm/library/apb4/peripheral_osvvm_model_pkg.vhd
+../../../../../../../../pu/functional/or1k/osvvm/library/apb4/peripheral_osvvm_model.vhd
+../../../../../../../../pu/functional/or1k/osvvm/library/apb4/peripheral_osvvm_model_pkg.vhd
 
-../../../../../../../../mpsoc/functional/or1k/osvvm/library/apb4/peripheral_osvvm_testbench.vhd
+../../../../../../../../pu/functional/or1k/osvvm/library/apb4/peripheral_osvvm_testbench.vhd
