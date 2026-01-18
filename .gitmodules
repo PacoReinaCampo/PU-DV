@@ -1,9 +1,9 @@
-[submodule "pu-or1k"]
-	path = pu-or1k
-	url = https://github.com/PacoReinaCampo/PU-OR1K.git
-[submodule "pu-msp430"]
-	path = pu-msp430
-	url = https://github.com/PacoReinaCampo/PU-MSP430.git
-[submodule "pu-riscv"]
-	path = pu-riscv
+[submodule "architecture/pu-riscv"]
+	path = architecture/pu-riscv
 	url = https://github.com/PacoReinaCampo/PU-RISCV.git
+[submodule "architecture/pu-or1k"]
+	path = architecture/pu-or1k
+	url = https://github.com/PacoReinaCampo/PU-OR1K.git
+[submodule "intelligence/pu-ntm"]
+	path = intelligence/pu-ntm
+	url = https://github.com/PacoReinaCampo/PU-NTM.git

@@ -42,5 +42,17 @@
 ##                                                                               ##
 ###################################################################################
 
+# Remove Submodule
+git rm -rf architecture/pu-riscv
+git rm -rf architecture/pu-or1k
+
+git rm -rf intelligence/pu-ntm
+
 # Update Submodule
 git submodule update --init --recursive --remote
+
+# Add Submodule
+git submodule add --force https://github.com/PacoReinaCampo/PU-RISCV.git architecture/pu-riscv
+git submodule add --force https://github.com/PacoReinaCampo/PU-OR1K.git architecture/pu-or1k
+
+git submodule add --force https://github.com/PacoReinaCampo/PU-NTM.git intelligence/pu-ntm
