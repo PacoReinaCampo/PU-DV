@@ -47,6 +47,8 @@ git rm -rf architecture/pu-riscv
 git rm -rf architecture/pu-or1k
 
 git rm -rf intelligence/pu-ntm
+git rm -rf intelligence/pu-dnc
+git rm -rf intelligence/pu-ann
 
 # Update Submodule
 git submodule update --init --recursive --remote
@@ -56,3 +58,5 @@ git submodule add --force https://github.com/PacoReinaCampo/PU-RISCV.git archite
 git submodule add --force https://github.com/PacoReinaCampo/PU-OR1K.git architecture/pu-or1k
 
 git submodule add --force https://github.com/PacoReinaCampo/PU-NTM.git intelligence/pu-ntm
+git submodule add --force https://github.com/PacoReinaCampo/PU-DNC.git intelligence/pu-dnc
+git submodule add --force https://github.com/PacoReinaCampo/PU-ANN.git intelligence/pu-ann

@@ -7,3 +7,9 @@
 [submodule "intelligence/pu-ntm"]
 	path = intelligence/pu-ntm
 	url = https://github.com/PacoReinaCampo/PU-NTM.git
+[submodule "intelligence/pu-dnc"]
+	path = intelligence/pu-dnc
+	url = https://github.com/PacoReinaCampo/PU-DNC.git
+[submodule "intelligence/pu-ann"]
+	path = intelligence/pu-ann
+	url = https://github.com/PacoReinaCampo/PU-ANN.git
